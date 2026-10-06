@@ -70,11 +70,11 @@ USB-C power supply, a microSD 32 GB High Endurance card, and the BGA "Ram Galant
 
 | Part | Notes | ≈ Price |
 |---|---|---|
-| 90° USB-C adapter (male → female) | So the power plug fits beside the Pi inside the pod | 50–100 kr |
+| 90° USB-C adapter (male → female), **sideways-bent** type (plug comes out of the adapter's side) | The cable then turns down along the board towards the spine. Flip it 180° if it points up | 50–100 kr |
 | USB-A → 2-pin fan cable, 5 V | Powers the Pi-Fan from a USB port, since the display board takes the GPIO pins | 30–60 kr |
 | Screw kit M2.5 + M3 (stainless) | Pi 4× M2.5×6, pod cover 4× M3×10 countersunk, stand 2× M3×16 | 100–200 kr |
 | 6× wood screws 2.5×10 mm countersunk | Back plate to the frame (pre-drill 1.5 mm) | 30–50 kr |
-| Self-adhesive foam/felt pads, 2–3 mm | Support the thin glass display panel evenly | 50–80 kr |
+| Self-adhesive soft foam sheet (EVA), 3 mm | One layer in the panel tray's pocket supports the glass panel evenly (`foam_t` = 2.5 mm compressed) | 50–100 kr |
 | PLA or PETG filament, ~300 g | For the indoor frame back and panel tray | – |
 | Passepartout, white or black, 13×18 cm outer, window about **95×159 mm** | Hides the panel's border; window just inside the image area (160×96 mm). BGA's made-to-measure mat (179,90 kr), or cut black card yourself. Measure the panel first | 0–180 kr |
 
@@ -85,8 +85,8 @@ USB-C power supply, a microSD 32 GB High Endurance card, and the BGA "Ram Galant
 | USB 2.0 extension, A‑male → A‑female, 2–3 m, **carries data** (flat if it crosses the window seal) | From the camera's cable to the Pi | 80–150 kr |
 | 2× stainless hose clamps (band ≤ 12 mm) | Strap the camera bracket to a railing post without drilling. Choose a size that fits around the post plus the 8 mm base | 40–80 kr |
 | EPDM/rubber tape | Between the bracket and the railing, to grip and protect the paint | 50 kr |
-| PG9 cable gland, IP68 | Seals the cable into the housing | 50–80 kr |
-| Round glass/acrylic disc, 32 mm × 2 mm | The housing's window (the size the housing model works out for this lens) | 30–80 kr |
+| Cable gland, IP68 (PG7 for a 3–6 mm cable, PG9 for 4–8 mm) | Seals the cable into the housing. Feed the camera end of the cable through it, since a USB-A plug won't fit. Set `gland_d` to the gland's thread | 50–80 kr |
+| 2 mm plexiglas (acrylic) sheet, small piece | Score with a knife and snap a **32×32 mm** square for the housing's window (Bauhaus, Biltema, Jula) | 50–100 kr |
 | 2 mm silicone O-ring cord or EPDM foam gasket tape | Seals the housing lid | 50–100 kr |
 | Clear outdoor silicone | Glues the window disc in | 60–100 kr |
 | Silica gel sachets | Keep the housing dry; replace each autumn | 40–80 kr |

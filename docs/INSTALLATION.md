@@ -121,15 +121,16 @@ The camera has to cope with rain most of the year, plus wet snow, frost (often a
       coldest days.
 - [ ] Print the housing in **ASA**: it handles UV and frost best. PETG is OK. Never use
       PLA, which gets brittle in the cold and soft in the sun.
-- [ ] Glue the window disc in from the inside with clear outdoor silicone, all the way
-      round.
+- [ ] Cut the 32×32 mm window pane from 2 mm acrylic (score and snap). Glue it in from
+      the inside with clear outdoor silicone, all the way round.
 - [ ] Put 2 mm silicone O-ring cord (or foam gasket tape) in the lid groove. Screw the lid
       on evenly. **Close it on a dry day**, so you don't trap humid air inside.
 - [ ] Put a **silica gel sachet** inside, and replace it each autumn. It stops the window
       from fogging up on cold mornings.
 - [ ] Optional: brush the camera board with **conformal coating** (protective lacquer),
       keeping it off the lens and connectors.
-- [ ] Tighten the cable gland around the cable, not around the plug.
+- [ ] Feed the camera end of the cable through the gland from outside, then plug it in.
+      Tighten the gland around the cable, not around the plug.
 - [ ] Make sure the rain hood is on top and the small weep hole points down. The long hood
       keeps driving rain and snow off the window.
 - [ ] Make the drip loop under the housing.

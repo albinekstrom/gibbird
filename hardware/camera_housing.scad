@@ -21,7 +21,7 @@
 //
 // Hardware: 4x M3 x 12 + washers (lid), 2x M4 x 10 + washers (tilt, self-tapping),
 // 2x stainless hose clamps (band <= 12 mm, size to fit post + base), PG9 cable gland,
-// round glass/acrylic window disc (disc_d x 2 mm) + clear silicone, 2 mm silicone O-ring
+// 2 mm acrylic window pane (32 x 32 mm square, cut from a sheet) + clear silicone, 2 mm silicone O-ring
 // cord (or 2 mm foam gasket tape), a silica gel sachet.
 
 part = "assembly"; // [assembly, body, lid, bracket]
@@ -36,7 +36,10 @@ aspect = [16, 9];
 behind = 18;          // room behind the board for the connector and the gland
 
 /* [Window] */
-disc_t = 2;
+pane = "square";      // "square": a 2 mm acrylic piece you score and snap yourself (easy to make);
+                      // "round": a bought round disc of disc_d
+pane_size = 32;       // side of the square pane
+disc_t = 2;           // pane thickness
 hood_max = 20;        // rain/snow hood beyond the window; shortened automatically so the
                       // lens never sees it
 
@@ -54,7 +57,8 @@ groove_w = 1.8;       // gasket groove in the lid for 2 mm cord
 groove_depth = 1.4;
 
 /* [Cable] */
-gland_d = 15.6;       // PG9 thread
+gland_d = 15.6;       // hole for the cable gland's thread: PG9 15.6, PG7 12.9, M12 12.4,
+                      // M16 16.4. Feed the camera end of the cable through the gland.
 weep_d = 2;
 
 /* [Mount] */
@@ -80,7 +84,7 @@ standoff = lens_len + 1;                   // lens stops 1 mm behind the window
 tan_d = tan(fov_d / 2);
 tan_v = tan_d * aspect.y / norm(aspect);
 win_d = ceil(lens_d + 2 * (front_t + 1) * tan_d + 1);
-disc_d = win_d + 4;
+disc_d = win_d + 4;   // round pane diameter (when pane = "round")
 hood_len = min(hood_max, floor((board.y / 2 + clear - win_d / 2) / tan_v) - 1);
 D_in = standoff + board_t + behind;
 D = D_in + front_t;
@@ -94,6 +98,8 @@ pivot_h = sqrt(pow(H / 2, 2) + pow(D / 2 + hood_len, 2)) + 3;   // room to tilt
 echo(str("housing ", W, " x ", H, " x ", D + hood_len, " mm; window ", win_d, " mm, disc ", disc_d,
          " mm; hood ", hood_len, " mm; board back at z = ", board_z));
 assert(disc_d / 2 < board.x / 2 - 2, "window disc too big to pass the board ribs: use a smaller lens_d/fov");
+assert(pane != "square" || (pane_size / 2 < board.x / 2 - 2 && pane_size >= win_d + 3),
+       "square pane must cover the window (win_d + 3) and pass the board ribs");
 
 module rsquare(size, r) { offset(r = r) offset(delta = -r) square(size, center = true); }
 
@@ -127,7 +133,10 @@ module body() {
         translate([0, 0, -1]) linear_extrude(D_in + 1) rsquare([in_w, in_h], 2);
         // window, and the disc's seat on the inside of the front wall
         translate([0, 0, D_in - 1]) cylinder(d = win_d, h = front_t + 2);
-        translate([0, 0, D_in - eps]) cylinder(d = disc_d + 0.4, h = disc_t);
+        if (pane == "square")
+            translate([-(pane_size + 0.4) / 2, -(pane_size + 0.4) / 2, D_in - eps]) cube([pane_size + 0.4, pane_size + 0.4, disc_t]);
+        else
+            translate([0, 0, D_in - eps]) cylinder(d = disc_d + 0.4, h = disc_t);
         // weep hole at the front of the bottom wall
         translate([0, -H / 2 - 1, D_in - 4]) rotate([-90, 0, 0]) cylinder(d = weep_d, h = wall + 2);
         // blind pilot holes in the pads (they stop short of the cavity)
@@ -213,6 +222,6 @@ else {
     translate([0, 0, pivot_h]) rotate([90 + tilt, 0, 0]) translate([0, 0, -pivot_z]) {
         color("#f4f2ed") body();
         color("#dcd6cc") translate([0, 0, -lid_t]) lid();
-        color("lightblue", 0.5) translate([0, 0, D_in]) cylinder(d = disc_d, h = disc_t);
+        color("lightblue", 0.5) translate([-pane_size / 2, -pane_size / 2, D_in]) cube([pane_size, pane_size, disc_t]);
     }
 }

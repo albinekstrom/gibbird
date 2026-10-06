@@ -38,6 +38,7 @@ mat_t = 1.4;          // passepartout; 0 if you don't use one
 /* [Display panel: Waveshare 7.3" e-Paper (E), portrait. CHECK when it arrives] */
 panel = [111.2, 170.2];  // outline of the glass panel
 panel_t = 1.2;
+foam_t = 2.5;            // foam behind the panel, compressed (3 mm self-adhesive EVA sheet)
 panel_shift = [0, 0];    // move the panel off-centre in the recess (mm)
 fpc_edge = "bottom";     // edge where the flat cable leaves the panel: bottom|top|left|right
 fpc_w = 26;              // width of the flat cable
@@ -140,7 +141,7 @@ in_pod = hdr0.x >= pod_in_x0 && hdr1.x <= pod_in_x1 && hdr0.y >= pod_in_y0 && hd
 assert(in_spine || in_pod, "the panel's cable slot must open into the spine or the pod: check fpc_edge/pod_y0");
 assert(hdr1.x + 2 < board0.x || hdr0.x - 2 > board0.x + pi_board.x || hdr1.y + 2 < board0.y
        || hdr0.y - 2 > board0.y + pi_board.y, "the cable slot is under the Pi: raise cable_room");
-assert(tray_t > panel_t + 1.5, "the frame's recess is too shallow for glass + mat + panel + tray");
+assert(tray_t > panel_t + foam_t + 1.2, "the frame's recess is too shallow for glass + mat + panel + foam + tray");
 assert(panel.x < rabbet_w && panel.y < rabbet_h, "the panel doesn't fit in the frame's recess");
 // The fan must not sit over the driver HAT (HAT: GPIO edge = board y 56, inwards by hat.y).
 assert(!fan || fan_at.y + fan_size / 2 < pi_board.x - hat.y, "fan is over the driver HAT: move fan_at");
@@ -246,13 +247,13 @@ module lower_region() {
 module panel_tray() {
     difference() {
         rbox2d_tray();
-        // pocket for the glass panel, with 0.5 mm for a layer of thin foam
-        translate([panel0.x - 0.3, panel0.y - 0.3, -1]) cube([panel.x + 0.6, panel.y + 0.6, 1 + panel_t + 0.5]);
+        // pocket for the glass panel plus the foam behind it
+        translate([panel0.x - 0.3, panel0.y - 0.3, -1]) cube([panel.x + 0.6, panel.y + 0.6, 1 + panel_t + foam_t]);
         // the flat cable passes through here (same slot as in the back plate)
         translate([hdr0.x, hdr0.y, -1]) cube([hdr_open.x, hdr_open.y, tray_t + 2]);
         // weight-saving windows that leave a supporting grid under the panel
         for (i = [0 : 2], j = [0 : 3])
-            translate([panel0.x + 8 + i * (panel.x - 16) / 3, panel0.y + 14 + j * (panel.y - 28) / 4, panel_t + 1.5])
+            translate([panel0.x + 8 + i * (panel.x - 16) / 3, panel0.y + 14 + j * (panel.y - 28) / 4, panel_t + foam_t + 1])
                 cube([(panel.x - 16) / 3 - 6, (panel.y - 28) / 4 - 6, tray_t]);
     }
 }
