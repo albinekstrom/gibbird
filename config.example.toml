@@ -1,8 +1,11 @@
 # Copy to config.toml and adjust. Paths are relative to this file.
 # Every key is optional; defaults are in gibbird/config.py.
 
+# One Raspberry Pi 5 behind the frame runs both `gibbird cam` and `gibbird frame`.
+
 [cam]
-source = "picamera2"          # or "opencv:0" (USB webcam) or "clip.mp4" (testing)
+source = "opencv:0"           # USB webcam (on a long USB cable); "picamera2" for Camera Module 3
+main_size = [1920, 1080]      # webcam: 1920x1080; Camera Module 3: [2304, 1296]
 region = "gothenburg"         # bundled list, or a CSV made with scripts/make_region.py
 allowlist_only = true         # ignore species not in the region list
 min_score = 0.55              # classifier confidence needed per frame
@@ -12,7 +15,7 @@ visit_gap_s = 120             # same species again within 2 min = same visit
 http_port = 8080
 
 [frame]
-server = "http://birdcam.local:8080"
+server = "http://localhost:8080"   # same Pi; the phone page is http://birdframe.local:8080
 subtitle = "Balkongens gäster"   # "Balcony Visitors"
 title = "Sedda idag"             # "Seen Today"
 title_recent = "Senaste gästerna"

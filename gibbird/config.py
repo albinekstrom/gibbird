@@ -10,8 +10,8 @@ from pathlib import Path
 @dataclass
 class CamConfig:
     # "picamera2", "opencv:<device index>", or a path to a video file (for testing).
-    source: str = "picamera2"
-    main_size: tuple[int, int] = (2304, 1296)
+    source: str = "opencv:0"
+    main_size: tuple[int, int] = (1920, 1080)
     lores_size: tuple[int, int] = (480, 270)
     framerate: float = 10.0
     model: str = "models/mobilenet_v2_1.0_224_inat_bird_quant.tflite"
@@ -38,7 +38,7 @@ class CamConfig:
 
 @dataclass
 class FrameConfig:
-    server: str = "http://birdcam.local:8080"
+    server: str = "http://localhost:8080"
     subtitle: str = "Balcony Visitors"
     title: str = "Seen Today"
     title_recent: str = "Recent Visitors"

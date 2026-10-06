@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import time
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
@@ -64,6 +65,18 @@ def _opencv_frames(src: int | str, cfg: CamConfig, is_file: bool) -> Iterator[Fr
     cap = cv2.VideoCapture(src)
     if not cap.isOpened():
         raise RuntimeError(f"cannot open video source {src!r}")
+    if not is_file:
+        # MJPG is needed for full HD at a useful frame rate over USB 2.0.
+        cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, cfg.main_size[0])
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cfg.main_size[1])
+        cap.set(cv2.CAP_PROP_FPS, cfg.framerate)
+        cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
+        logging.getLogger(__name__).info(
+            "USB camera running at %dx%d",
+            cap.get(cv2.CAP_PROP_FRAME_WIDTH),
+            cap.get(cv2.CAP_PROP_FRAME_HEIGHT),
+        )
     start = time.time()
     try:
         while True:
