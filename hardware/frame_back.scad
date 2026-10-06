@@ -1,11 +1,11 @@
 // GibBird — 3D-printed back cover with a flip-out stand for an A4 picture frame
-// holding a Pimoroni Inky Impression 13.3", with a Raspberry Pi 5 hidden behind it.
+// holding a Pimoroni Inky Impression 13.3", with a Raspberry Pi 4 or 5 hidden behind it.
 //
 // Coordinates are seen FROM THE BACK with the frame standing in portrait.
 // Origin = bottom-left corner of the frame's back face, Z points away from the display.
 //
 // The cover screws onto the back of the wooden frame (6 small wood screws). A vented
-// hood hides the Pi 5 (with Active Cooler), which sits on 4 bosses next to an opening
+// hood hides the Pi (Pi 4 and Pi 5 share the same footprint), which sits on 4 bosses next to an opening
 // over the display's 40-pin header; a short ribbon cable joins the two inside the hood.
 // The power and camera cables leave through the hood's right wall, run down in clips
 // and pass under the stand's foot. The stand folds flat around the hood and flips out
@@ -30,7 +30,7 @@ hdr_x = 62;           // estimated from photos: measure yours!
 hdr_y = 137;
 hdr_open = [16, 66];  // opening for header + ribbon plug (header runs vertically)
 
-/* [Raspberry Pi 5] */
+/* [Raspberry Pi 4 / 5] */
 ribbon_gap = 6;       // space between the header opening and the Pi
 boss_h = 4;           // Pi stands this far above the plate
 boss_d = 6;
@@ -38,7 +38,11 @@ boss_hole_d = 2.2;    // M2.5 x 6 screws self-tap
 pi_tall = 16;         // tallest part above the Pi's board (USB-A stack)
 plug_room = 20;       // room above the USB-A ports for a right-angle plug
 power_slot = [14, 10];   // USB-C power plug passes through (width along wall, height)
-usb_slot = [18, 12];     // camera cable (USB-A right-angle plug) passes through
+usb_slot = [18, 12];     // USB camera cable (USB-A right-angle plug) passes through
+// Flat camera cable (Camera Module via CSI). Pi 4: connector 45 mm from the GPIO end.
+// Set csi_slot = [0, 0] to leave it out.
+csi_slot = [20, 6];
+csi_at = 45;
 
 /* [Back plate] */
 plate_t = 3.2;
@@ -74,7 +78,7 @@ lap = 16;             // glued lap joint length
 /* [Hidden] */
 $fn = 48;
 eps = 0.01;
-pi_board = [56, 85];  // Pi 5 lying vertically: GPIO edge left, USB-C right, USB-A at top
+pi_board = [56, 85];  // Pi lying vertically: GPIO edge left, USB-C right, USB-A at top
 m_x = (frame_w - rabbet_w) / 2;
 m_y = (frame_h - rabbet_h) / 2;
 hdr = [m_x + hdr_x, m_y + hdr_y];
@@ -91,11 +95,12 @@ leg_in0 = stand_cx - stand_w / 2 + bar_w;
 leg_in1 = stand_cx + stand_w / 2 - bar_w;
 // Length of the stop tab behind the hinge: it touches the plate exactly at `stand_open`.
 tail = (hinge_r + hinge_gap - hinge_r * cos(stand_open)) / sin(stand_open);
-// Pi 5 holes / ports, mapped from board coordinates (x along 85 mm, y along 56 mm,
+// Pi holes / ports, mapped from board coordinates (x along 85 mm, y along 56 mm,
 // USB-C edge at y = 0) to the rotated position on the plate.
 function on_plate(p) = [board0.x + pi_board.x - p.y, board0.y + p.x];
 pi_holes = [for (x = [3.5, 61.5], y = [3.5, 52.5]) on_plate([x, y])];
 power_y = on_plate([11.2, 0]).y;
+csi_y = on_plate([csi_at, 0]).y;
 usb_y = board0.y + pi_board.y + plug_room / 2;
 
 assert(hood_out0.x > leg_in0, "hood hits the left stand leg: move hdr_x or narrow the stand");
@@ -136,9 +141,11 @@ module hood_cuts() {
             cube([5, pi_board.y - 20, wall + 2]);
     for (i = [0 : 4])
         translate([hood_in0.x + 8 + i * 14, hood_out0.y - 1, plate_t + 3]) cube([7, wall + 2, 8]);
-    // cable slots in the right wall: USB-C power next to its port, camera cable at the top
+    // cable slots in the right wall: USB-C power next to its port, camera ribbon, USB at the top
     translate([hood_in1.x - 1, power_y - power_slot.x / 2, board_z]) cube([wall + 2, power_slot.x, power_slot.y]);
     translate([hood_in1.x - 1, usb_y - usb_slot.x / 2, board_z]) cube([wall + 2, usb_slot.x, usb_slot.y]);
+    if (csi_slot.x > 0)
+        translate([hood_in1.x - 1, csi_y - csi_slot.x / 2, board_z + 4]) cube([wall + 2, csi_slot.x, csi_slot.y]);
 }
 
 module hinge_blocks() {

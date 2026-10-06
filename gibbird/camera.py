@@ -36,6 +36,7 @@ def _picamera2_frames(cfg: CamConfig) -> Iterator[Frame]:
         main={"size": tuple(cfg.main_size), "format": "BGR888"},
         lores={"size": tuple(cfg.lores_size), "format": "YUV420"},
         controls={"FrameRate": cfg.framerate},
+        buffer_count=3,  # a full 12 MP RGB frame is 36 MB; keep camera memory (CMA) use low
     )
     cam.configure(config)
     cam.start()

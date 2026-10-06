@@ -1,11 +1,22 @@
 # Copy to config.toml and adjust. Paths are relative to this file.
 # Every key is optional; defaults are in gibbird/config.py.
 
-# One Raspberry Pi 5 behind the frame runs both `gibbird cam` and `gibbird frame`.
+# One Raspberry Pi (4 or 5) behind the frame runs both `gibbird cam` and `gibbird frame`.
 
 [cam]
-source = "opencv:0"           # USB webcam (on a long USB cable); "picamera2" for Camera Module 3
-main_size = [1920, 1080]      # webcam: 1920x1080; Camera Module 3: [2304, 1296]
+# Camera Module 3 Wide over the CSI ribbon. Wide view = small birds, so use the
+# full 12 MP image for crops and let tiny moving regions through.
+source = "picamera2"
+main_size = [4608, 2592]      # full sensor; try [2304, 1296] if the Pi runs out of memory
+lores_size = [640, 360]
+framerate = 5
+motion_min_area = 0.0005      # a small bird far away is only ~0.1 % of the picture
+# USB webcam instead (on a long active USB cable):
+#   source = "opencv:0"
+#   main_size = [1920, 1080]
+#   lores_size = [480, 270]
+#   framerate = 10
+#   motion_min_area = 0.002
 region = "gothenburg"         # bundled list, or a CSV made with scripts/make_region.py
 allowlist_only = true         # ignore species not in the region list
 min_score = 0.55              # classifier confidence needed per frame

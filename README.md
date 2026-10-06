@@ -10,11 +10,11 @@ names and a Swedish poster. Everything that depends on location sits in one regi
 file, so you can make a list for anywhere else (see [Other locations](#other-locations)).
 
 ```
- BALCONY                 5–10 m USB cable       BEDROOM (hidden behind the frame)
+ BALCONY                 camera cable           BEDROOM (hidden behind the frame)
  ┌──────────────────┐   ─────────────────────▶ ┌────────────────────────────────┐
- │ USB webcam in a  │                          │ Raspberry Pi 5                 │
- │ weatherproof box │                          │  gibbird cam:   motion → crop  │
- │ facing a feeder  │                          │                 → classify     │
+ │ Camera Module 3  │   (CSI, CSI→HDMI kit,    │ Raspberry Pi 4 (or 5)          │
+ │ Wide in a        │    or USB webcam)        │  gibbird cam:   motion → crop  │
+ │ weatherproof box │                          │                 → classify     │
  └──────────────────┘                          │  gibbird frame: poster → Inky  │
                                                │ ribbon cable → Inky 13.3" panel│
                                                └────────────────────────────────┘
@@ -33,12 +33,14 @@ file, so you can make a list for anywhere else (see [Other locations](#other-loc
 4. **Flash the SD card** with Raspberry Pi Imager → *Raspberry Pi OS Lite (64-bit)*.
    In the Imager settings, set Wi-Fi, enable SSH, and use the hostname `birdframe`.
 5. **Build the frame.** Put the display face-down in the frame with foam strips on
-   top. Screw the Pi 5 (with Active Cooler) onto the four bosses in the printed back.
+   top. Take the Pi 4 out of its aluminium case (keep the stick-on heatsinks) and screw
+   it onto the four bosses in the printed back.
    Plug the ribbon cable into the display header, then screw the back onto the frame
    and plug the other end into the Pi. Run the power and camera cables out through the
    hood's right wall, along the clips, and under the stand's foot.
-6. **Mount the camera** in a weatherproof box facing the feeder. Run the USB cable
-   inside along the balcony door seal (a flat cable fits better) and plug it into the Pi.
+6. **Mount the camera** in a weatherproof box, high in a corner so it sees the whole
+   balcony, with the feeder no more than about 2 m away. Run the cable inside along
+   the balcony door seal and into the hood.
 7. **Install the software** ([Software](#software)). Use `gibbird classify` on a few
    photos and check the web page at `http://birdframe.local:8080`.
 8. **Tune** `min_score`, the camera angle and the feeder position in the first week.
@@ -53,26 +55,44 @@ Electrokit, Kjell & Company or Webhallen. Pimoroni and The Pi Hut ship to Sweden
 | Part | Notes | ≈ Price |
 |---|---|---|
 | Pimoroni Inky Impression 13.3" (2025 ed., Spectra 6) | 1600×1200, 6 colours, PCB is exactly A4 (297×210 mm) | £230 / $275 |
-| Raspberry Pi 5, 4 GB | Runs camera, classifier and display. Classifies a crop in about 30–60 ms | 750 kr |
-| Raspberry Pi 5 Active Cooler | It sits in a closed hood | 60 kr |
+| ~~Raspberry Pi~~ | **Already owned: Pi 4 Model B.** It runs the camera, classifier and display. A Pi 5 also fits the same hood | – |
 | 40-pin GPIO ribbon extension cable, **female → male**, 10–20 cm | Joins the Pi to the display header. Match pin 1 to pin 1 | 60 kr |
 | 4× M2.5×6 screws | Pi onto the printed bosses | 20 kr |
-| Official 27 W USB-C power supply | Needed so the Pi can power the USB camera. Use a mains extension cord to reach the socket, not a long USB-C cable | 150 kr |
+| Official Pi 4 USB-C power supply (5.1 V 3 A) | Use a mains extension cord to reach the socket, not a long USB-C cable | 100 kr |
 | microSD 32 GB **High Endurance** | It writes continuously | 150 kr |
 | A4 / 21×30 cm wooden frame | The back must be flat and about 20 mm wide so screws can go in. Check the rabbet depth | 150–300 kr |
 | 6× wood screws 3×12 mm countersunk, 2× M3×16 screws | M3 screws are the stand's hinge pins | 30 kr |
 | Self-adhesive foam/felt strips, 2–3 mm | Press the display against the glass | 50 kr |
 | ~300 g PETG or PLA | | |
 
+The fan from your case runs off GPIO pins 4 and 6, but the display ribbon takes the
+whole header. Start without the fan; the heatsinks and hood vents should be enough
+because the Pi only classifies when something moves. Check `vcgencmd measure_temp`.
+If it goes above about 75 °C, add a 40-pin GPIO 1-to-2 splitter so the fan can
+plug in next to the ribbon.
+
 **Camera (balcony)**
 
-How you get the picture to the Pi depends on the distance:
+A wide-angle camera sees the whole balcony, but each bird takes up fewer pixels.
+Roughly, for a 12 cm bird:
 
-| Option | Parts | ≈ Price |
+| Camera | Field of view | Bird at 1 m | at 2 m | at 3 m |
+|---|---|---|---|---|
+| Camera Module 3 **Wide**, full 12 MP | 102° horizontal | ~230 px | ~110 px | ~75 px |
+| Camera Module 3 (standard), full 12 MP | 66° | ~420 px | ~210 px | ~140 px |
+| 1080p USB webcam, ~78° | 78° | ~140 px | ~70 px | ~45 px |
+
+The classifier looks at 224×224 px crops. It's reliable from about 100 px and gets
+poor below about 60 px. With the Wide camera, keep the feeder or perch within about
+2 m. Birds further away will be detected, but often not identified.
+
+Recommended: **Camera Module 3 Wide** (≈350 kr), with the cable chosen by distance.
+
+| Distance Pi → camera | Cable | ≈ Price |
 |---|---|---|
-| **A. USB webcam (recommended, up to ~10 m)** | 1080p autofocus webcam (e.g. Logitech C920/C922) + **active** USB 2.0 extension cable 5 or 10 m + a right-angle USB-A adapter at the Pi end | 700–1,000 kr |
-| B. Camera Module 3, short run (≤ 0.5 m) | Camera Module 3 + Pi 5 camera cable 22→15-pin, 500 mm. Only works if the Pi is right next to the window | 350 kr |
-| C. Camera Module 3, long run | Camera Module 3 + a CSI-to-HDMI extension kit (e.g. Arducam). Check that it says it supports the Pi 5 | 600 kr |
+| up to ~1 m | Standard 15-pin camera ribbon cable (Pi 4 uses the full-size connector), 1 m | 50 kr |
+| further (through a wall or door) | CSI-to-HDMI extension kit (e.g. Arducam) + flat HDMI cable. Check it lists Camera Module 3 | 300–400 kr |
+| alternative | 1080p USB webcam + **active** USB extension 5–10 m. Simpler, but lower resolution (see above) | 700–1,000 kr |
 
 For either option, add:
 
@@ -81,7 +101,7 @@ For either option, add:
 | IP65 junction box with a clear lid + cable gland + silica gel | Or put the camera indoors behind the balcony door glass. That avoids weather but you get reflections | 150–250 kr |
 | Feeder / perch | This is what brings the birds to the camera | 100–300 kr |
 
-**Total:** about 5,000–5,500 kr with option A, mostly the display.
+**Total:** about 4,000–4,500 kr, since you already have the Pi. Most of it is the display.
 
 ## 3D-printed back
 
@@ -92,11 +112,11 @@ Customizer panel.
 ![Assembly](docs/assembly.png)
 
 - **Back plate.** Covers the frame's back and screws into the wood with 6 screws.
-- **Pi hood.** The Pi 5 is screwed flat onto four bosses inside a vented hood
+- **Pi hood.** The Pi (4 or 5) is screwed flat onto four bosses inside a vented hood
   (90×115 mm, 27 mm deep). Its GPIO edge faces an opening over the display's 40-pin
   header, so a short ribbon cable joins the two inside the hood. The hood has roof
-  vents over the cooler and low vents in the bottom wall. Two slots in the right wall
-  let the USB-C power plug and the camera's USB plug pass through.
+  vents over the cooler and low vents in the bottom wall. Three slots in the right wall let
+  the USB-C power plug, the flat camera cable and a USB plug pass through.
 - **Cables.** Snap-in clips guide both cables down to the bottom edge, and they
   pass under an arch in the stand's foot.
 - **Flip-out stand.** A rectangular stand that folds flat around the hood. It pivots
@@ -136,8 +156,8 @@ scripts/           model download, region generator
 systemd/           services (camera + frame, both on the same Pi)
 ```
 
-How detection works. The 480×270 stream is checked for motion. Each moving region
-is cut out of the full-resolution frame (1920×1080 from a webcam) as a square, padded, and classified. A
+How detection works. A low-resolution stream is checked for motion. Each moving region
+is cut out of the full-resolution frame (12 MP on Camera Module 3) as a square, padded, and classified. A
 species only counts when it wins 2 of 4 checks in a row, and it must be on the region
 list. This stops the model from reporting, say, an American goldfinch in Gothenburg.
 Sightings less than 2 minutes apart count as one visit. The most confident photo of
@@ -148,7 +168,7 @@ least 15 minutes between refreshes and stays dark 23:00–07:00. A full Spectra
 refresh takes about 30 s and flashes. If nothing has been seen today, it shows the
 last 7 days instead.
 
-### Raspberry Pi 5 (`birdframe`)
+### Raspberry Pi (`birdframe`)
 
 ```bash
 sudo raspi-config nonint do_spi 0 && sudo raspi-config nonint do_i2c 0
@@ -159,7 +179,8 @@ git clone https://github.com/albinekstrom/gibbird.git ~/gibbird && cd ~/gibbird
 python3 -m venv --system-site-packages .venv      # opencv/picamera2 come from apt
 .venv/bin/pip install -e '.[cam,frame]'
 scripts/download_model.sh
-cp config.example.toml config.toml                # webcam by default; see [cam] source
+cp config.example.toml config.toml                # Camera Module 3 Wide by default
+rpicam-hello --list-cameras                       # camera detected?
 .venv/bin/gibbird -c config.toml frame --once     # panel test (shows "Offline")
 .venv/bin/gibbird -c config.toml cam              # watch the log, Ctrl-C when happy
 sudo cp systemd/gibbird-cam.service systemd/gibbird-frame.service /etc/systemd/system/
@@ -179,8 +200,8 @@ scripts/download_model.sh
 .venv/bin/gibbird -c config.example.toml frame --once --preview p.png  # against a running cam
 ```
 
-The example config uses `source = "opencv:0"`, so with a webcam attached the full
-camera pipeline also runs on a laptop. `source = "clip.mp4"` plays a video file instead.
+To run the full camera pipeline on a laptop, set `source = "opencv:0"` (webcam) or
+`source = "clip.mp4"` (a video file).
 
 ## Other locations
 
