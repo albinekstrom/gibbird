@@ -193,24 +193,23 @@ least 15 minutes between refreshes and stays dark 23:00–07:00. A full Spectra
 refresh takes about 30 s and flashes. If nothing has been seen today, it shows the
 last 7 days instead.
 
-### Raspberry Pi (`birdframe`)
+### Raspberry Pi (`birdframe`): deploy from your computer
+
+You develop on your Mac and push to the Pi over SSH. The Pi doesn't need git or GitHub.
 
 ```bash
-sudo raspi-config nonint do_spi 0 && sudo raspi-config nonint do_i2c 0
-# The 13.3" panel uses both SPI chip-selects itself (see Pimoroni's inky README):
-echo "dtoverlay=spi0-0cs" | sudo tee -a /boot/firmware/config.txt && sudo reboot
-sudo apt update && sudo apt install -y git python3-opencv python3-picamera2 fonts-dejavu-core
-git clone https://github.com/albinekstrom/gibbird.git ~/gibbird && cd ~/gibbird
-python3 -m venv --system-site-packages .venv      # opencv/picamera2 come from apt
-.venv/bin/pip install -e '.[cam,frame]'
-scripts/download_model.sh
-cp config.example.toml config.toml                # Camera Module 3 Wide by default
-rpicam-hello --list-cameras                       # camera detected?
-.venv/bin/gibbird -c config.toml frame --once     # panel test (shows "Offline")
-.venv/bin/gibbird -c config.toml cam              # watch the log, Ctrl-C when happy
-sudo cp systemd/gibbird-cam.service systemd/gibbird-frame.service /etc/systemd/system/
-sudo systemctl enable --now gibbird-cam gibbird-frame
+cp config.example.toml config.toml        # edit locally; it is copied on every deploy
+scripts/deploy.sh --setup                  # first time: packages, SPI/I2C, venv, services
+                                           # (reboots once; then run scripts/deploy.sh again)
+scripts/deploy.sh                          # after every change: sync + restart
+scripts/deploy.sh --logs                   # follow the logs
+scripts/deploy.sh --status                 # services + CPU temperature
 ```
+
+The target defaults to `albin@birdframe.local`; set `GIBBIRD_HOST=user@host` to change
+it. The deploy uses rsync and leaves the Pi's `data/` folder (visits, photos,
+calibration) and its Python environment alone. Python packages are only reinstalled
+when `pyproject.toml` changes.
 
 If the poster comes out upside down, set `rotation = 270`.
 

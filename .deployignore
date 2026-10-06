@@ -1,11 +1,9 @@
+.git/
 .venv/
 __pycache__/
 *.egg-info/
-/models/
-/data/
-*.stl
-*.png
-!docs/*.png
 .pytest_cache/
-config.toml
+/data/
+/config.toml
+hardware/stl/
 .DS_Store
