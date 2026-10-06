@@ -66,7 +66,8 @@ Electrokit, Kjell & Company or Webhallen. Pimoroni and The Pi Hut ship to Sweden
 | Official Pi 4 USB-C power supply (5.1 V 3 A) | Use a mains extension cord to reach the socket, not a long USB-C cable | 100 kr |
 | microSD 32 GB **High Endurance** | It writes continuously | 150 kr |
 | BGA "Galant" A4 frame (22.7×31.4 cm, acrylic) | The 3D model's defaults match it: 8 mm rabbet, 13 mm profile | 150 kr |
-| 6× wood screws 2.5×10 mm countersunk, 2× M3×16 screws | Pre-drill 1.5 mm, because the frame's back edge is only ~8 mm wide. The M3 screws are the stand's hinge pins | 30 kr |
+| 6× wood screws 2.5×10 mm countersunk, 4× M3×10 countersunk, 2× M3×16 | Pre-drill 1.5 mm for the wood screws, because the frame's back edge is only ~8 mm wide. M3×10 hold the pod cover, M3×16 are the stand's pivots | 40 kr |
+| 90° USB-C power cable (or angle adapter) | Fits beside the Pi inside the pod | 60 kr |
 | Self-adhesive foam/felt strips, 2–3 mm | Press the display against the glass | 50 kr |
 | Black paper/card mask (optional) | The window is about 201×288 mm, so ~9 mm of the display's printed border shows at one end. A cut mask hides it | – |
 | ~300 g PETG or PLA | | |
@@ -112,40 +113,49 @@ For either option, add:
 (the `openscad@snapshot` Homebrew cask works on macOS), open the file and use the
 Customizer panel.
 
-![Assembly](docs/assembly.png)
+| Stand open | Stand closed |
+|---|---|
+| ![Back with the stand open](docs/assembly.png) | ![Back with the stand closed](docs/assembly_closed.png) |
 
-- **Back plate.** Covers the frame's back and screws into the wood with 6 screws.
-- **Pi hood.** The Pi (4 or 5) is screwed flat onto four bosses inside a vented hood
-  (90×115 mm, 27 mm deep). Its GPIO edge faces an opening over the display's 40-pin
-  header, so a short ribbon cable joins the two inside the hood. The hood has roof
-  vents over the cooler and low vents in the bottom wall. Slots in the right wall let the
-  USB-C power plug and the camera's USB plug pass through. A slot for a flat
-  camera ribbon can be turned on with `csi_slot`.
-- **Fan.** A 30 mm fan mount (4 screw holes and a grille) in the roof, over the
-  processor. Intake vents are in the bottom wall.
-- **Cables.** Power and camera cables leave through slots in the right wall. Zip-tie
-  anchors just below the slots act as strain relief, so a tug on the cable doesn't pull
-  on the Pi. Snap-in clips and more anchors guide both cables down to the bottom
-  edge, under an arch in the stand's foot. The fan's USB cable and the display ribbon
-  stay inside the hood.
-- **Flip-out stand.** A rectangular stand that folds flat around the hood. It pivots
-  on two M3×16 screws that self-tap into the hinge blocks. A small stop tab behind the
-  hinge sets the opening angle (`stand_open`, default 35°). The tab length is
-  calculated from that angle.
-- **Split.** The plate is 251×338 mm by default, so it is split into two pieces
-  joined by a glued 16 mm lap joint (`split_y`). All parts fit a 256×256 bed.
-  Glue with CA or epoxy.
+The back is one clean central column, and nothing else is visible:
+
+- **Pod.** Hides the Pi (4 or 5). The Pi screws onto four bosses on the plate, next
+  to an opening over the display's 40-pin header, and a short ribbon cable joins them
+  inside. The pod **cover** is a separate part, printed roof-down for a smooth finish
+  with no sagging spans. It comes off with 4 screws that are hidden under the stand,
+  so you can reach the Pi without taking the back off the frame.
+- **Fan.** A 30 mm fan mount and grille in the cover's roof, over the processor. Air
+  comes in through slots in the cover's bottom wall.
+- **Spine.** A hollow channel from the pod down to the bottom edge. The power and
+  camera cables run inside it, so no clips, zip ties or loose cables show. Use a
+  **90° (angled) USB-C power cable**: there are 14 mm beside the Pi for the plug.
+- **Stand.** A solid flap that closes over the pod and spine, so from behind the frame
+  looks like a slab with one neat block on it. It has vent slots over the fan. It
+  pivots on two M3×16 screws in towers at the top of the pod, and a stop tab sets the
+  angle (`stand_open`, default 35°).
+- **Plate.** Rounded corners and softened edges. It screws onto the frame with 6 small
+  countersunk screws. On a 256 mm print bed it's printed in two halves, joined by a
+  glued lap joint. The joint lines up with a thin groove, so it reads as a design line
+  rather than a seam.
+
+**Assembly:** glue the plate halves → screw the Pi onto the bosses → plug the ribbon
+into the Pi → thread the power and camera cables up through the spine and plug them
+in → put the display face-down in the frame with foam strips → plug the ribbon into
+the display header, lower the plate and screw it to the frame → screw the fan into
+the cover and plug its USB lead into the Pi → screw on the cover (4× M3×10) → fit
+the stand (2× M3×16).
 
 Measure these before printing: `frame_w/h`, `rabbet_w/h`, `display_recess`, and the
 display header centre `hdr_x/hdr_y`. The header centre is measured from the bottom-left
 of the rabbet, looking at the **back**, with the frame in portrait. The default
 (62, 137) is only an estimate from the video. The Pi's position is worked out from
-the header position. The file will refuse to render if the hood would collide with
-the stand or the seam. The `stl/` folder has exports made with the default numbers,
+the header position. The file refuses to render if the display header ends up outside the pod or under
+the Pi, or if the seam runs through the pod. The `stl/` folder has exports made with the default numbers,
 so treat them as a test print only.
 
-Print flat side down: 0.2 mm layers, 3 walls, 15 % infill. Only the hood roof
-bridges, so no supports are needed. PETG handles a warm windowsill better than PLA.
+No part needs supports: plate halves flat side down, cover roof down, stand pod-side
+down. Use 0.2 mm layers, 3 walls and 15 % infill. PETG handles a warm windowsill
+better than PLA. A matte or silk filament in one colour gives the cleanest look.
 
 ## Software
 

@@ -4,7 +4,9 @@ The frame stands in the office window, and the camera sits just outside that win
 looking at the balcony next to it. The camera cable comes in through the window
 seal, so you don't drill anything and the cable run is short.
 
-![Camera housing on its tilt bracket](camera_housing.png)
+| Camera housing, front | Back (lid with gasket and cable gland) |
+|---|---|
+| ![Camera housing, front](camera_housing.png) | ![Camera housing, back](camera_housing_back.png) |
 
 ## Overview (seen from above)
 
@@ -79,7 +81,7 @@ needs about 100 px to be reliable.
    Use a **flat** USB 2.0 extension cable here (1–2 mm thick). Close the window
    and check that it still latches and doesn't let in a draught.
 4. Inside, run the cable along the window frame and down to the window seat, then
-   into the slot in the right side of the frame's printed back.
+   up into the spine at the bottom edge of the frame's printed back.
 
 **Length:** about 0.5 m outside, 0.3 m through the window and 1–1.5 m inside, so a
 **3 m flat USB 2.0 extension** is enough. Together with the camera's own cable,
@@ -139,7 +141,7 @@ for about −20 to +70 °C, so temperature is fine.
 | Round glass/acrylic disc, 30 mm × 2 mm | 30 kr |
 | 2 mm silicone O-ring cord or foam gasket tape | 50 kr |
 | Clear outdoor silicone | 60 kr |
-| 4× M3×12 and 2× M4×12 stainless screws + washers | 30 kr |
+| 4× M3×12 and 2× M4×10 stainless screws + washers | 30 kr |
 | Outdoor VHB tape (or 2× stainless 4×25 screws) | 80 kr |
 | Outdoor cable clips | 40 kr |
 | Silica gel sachets | 30 kr |
