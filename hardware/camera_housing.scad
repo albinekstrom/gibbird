@@ -7,7 +7,8 @@
 // inside the shell or under the lid. The board is held by four ribs and pressed into
 // place by pegs on the lid, so it needs no screws.
 //
-// Print in PETG or ASA (not PLA: sun and heat), 4 walls, 30 % infill, no supports:
+// Built for Swedish weather (rain, snow, frost): print in ASA (best: UV- and cold-proof) or PETG,
+// never PLA (brittle in frost, soft in sun). 4 walls, 30 % infill, no supports:
 //   body:    back opening on the bed
 //   lid:     outer face on the bed
 //   bracket: base on the bed
@@ -28,10 +29,10 @@ behind = 18;          // room behind the board for the connector and the gland
 disc_d = 30;          // round glass/acrylic window
 disc_t = 2;
 win_d = 26;           // visible opening (keep wider than the lens's view cone)
-hood_len = 16;        // rain hood beyond the window
+hood_len = 24;        // rain/snow hood beyond the window (long: driving rain and snow)
 
 /* [Shell] */
-wall = 2.4;
+wall = 3.0;           // thick walls keep the camera's own heat in during winter
 clear = 7;            // space around the board on each side (room for the screw bosses)
 front_t = 3;
 radius = 8;           // vertical edges

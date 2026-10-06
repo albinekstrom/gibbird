@@ -104,20 +104,33 @@ sloping slightly downwards towards the outside, and seal it with silicone.
 - **E-ink** doesn't glow and has no glare, so it looks like a print. It can stand
   facing the room in daylight.
 
-## 5. Weatherproofing checklist
+## 5. Weatherproofing for a Swedish winter
 
-Gothenburg means rain, wind and the occasional frost. Most board cameras are rated
-for about −20 to +70 °C, so temperature is fine.
+The camera has to cope with rain most of the year, plus wet snow, frost (often around
+0 °C, sometimes −10 °C), wind, and condensation every time the temperature drops.
 
-- [ ] Print the housing in **PETG or ASA**. PLA softens in the sun.
-- [ ] Glue the window disc in from the inside with clear silicone, all the way round.
-- [ ] Put 2 mm silicone O-ring cord (or foam gasket tape) in the groove on the back
-      rim. Screw the lid on evenly.
-- [ ] Tighten the PG9 cable gland around the cable, not around the plug.
-- [ ] Make sure the visor is on top and the small weep hole points down.
-- [ ] Add a silica gel sachet inside, and replace it each autumn.
+- [ ] **Choose a camera rated to −20 °C** (e.g. Arducam IMX708 USB, −20 to +70 °C).
+      Boards rated "0–50 °C" often still work, but they're outside their rating on the
+      coldest days.
+- [ ] Print the housing in **ASA**: it handles UV and frost best. PETG is OK. Never use
+      PLA, which gets brittle in the cold and soft in the sun.
+- [ ] Glue the window disc in from the inside with clear outdoor silicone, all the way
+      round.
+- [ ] Put 2 mm silicone O-ring cord (or foam gasket tape) in the lid groove. Screw the lid
+      on evenly. **Close it on a dry day**, so you don't trap humid air inside.
+- [ ] Put a **silica gel sachet** inside, and replace it each autumn. It stops the window
+      from fogging up on cold mornings.
+- [ ] Optional: brush the camera board with **conformal coating** (protective lacquer),
+      keeping it off the lens and connectors.
+- [ ] Tighten the cable gland around the cable, not around the plug.
+- [ ] Make sure the rain hood is on top and the small weep hole points down. The long hood
+      keeps driving rain and snow off the window.
 - [ ] Make the drip loop under the housing.
-- [ ] After the first heavy rain, open the lid and check that it's dry.
+- [ ] Leave the camera powered all the time. It gives off about 1 W of heat, which keeps
+      the inside a few degrees above the outside temperature and the window free of frost.
+- [ ] Check after the first heavy rain, and again after the first snow, that it's dry
+      inside.
+- [ ] Check now and then that snow hasn't built up in front of the hood.
 
 ## 6. After mounting
 
