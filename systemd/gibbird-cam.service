@@ -1,0 +1,16 @@
+# Camera Pi: sudo cp systemd/gibbird-cam.service /etc/systemd/system/ && sudo systemctl enable --now gibbird-cam
+# Change User and paths if your user is not "pi".
+[Unit]
+Description=GibBird balcony camera
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/gibbird
+ExecStart=/home/pi/gibbird/.venv/bin/gibbird -c /home/pi/gibbird/config.toml cam
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

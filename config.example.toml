@@ -1,0 +1,24 @@
+# Copy to config.toml and adjust. Paths are relative to this file.
+# Every key is optional; defaults are in gibbird/config.py.
+
+[cam]
+source = "picamera2"          # or "opencv:0" (USB webcam) or "clip.mp4" (testing)
+region = "gothenburg"         # bundled list, or a CSV made with scripts/make_region.py
+allowlist_only = true         # ignore species not in the region list
+min_score = 0.55              # classifier confidence needed per frame
+confirm_frames = 2            # ...in this many of the last `confirm_window` checks
+confirm_window = 4
+visit_gap_s = 120             # same species again within 2 min = same visit
+http_port = 8080
+
+[frame]
+server = "http://birdcam.local:8080"
+subtitle = "Balkongens gäster"   # "Balcony Visitors"
+title = "Sedda idag"             # "Seen Today"
+title_recent = "Senaste gästerna"
+names = "local"               # bird names: "local" (Swedish for gothenburg) or "en"
+language = "sv"               # dates and labels: "sv" or "en"
+rotation = 90                 # use 270 if the poster comes out upside down
+saturation = 0.6
+min_refresh_minutes = 15      # e-ink refresh takes ~30 s; don't do it too often
+quiet_hours = [23, 7]         # no refreshes at night (the panel flashes)

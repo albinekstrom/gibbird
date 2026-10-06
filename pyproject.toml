@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gibbird"
+version = "0.1.0"
+description = "Balcony bird camera that classifies visitors and shows them on an e-ink frame"
+requires-python = ">=3.11"
+dependencies = ["numpy", "pillow>=10.1"]
+
+[project.optional-dependencies]
+# Camera Pi. picamera2 and opencv come from apt on Raspberry Pi OS (see README).
+cam = ["ai-edge-litert"]
+# Display Pi.
+frame = ["inky>=2.0"]
+dev = ["pytest", "opencv-python-headless"]
+
+[project.scripts]
+gibbird = "gibbird.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["gibbird*"]
+
+[tool.setuptools.package-data]
+gibbird = ["data/regions/*.csv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

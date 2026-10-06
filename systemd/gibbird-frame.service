@@ -1,0 +1,16 @@
+# Display Pi: sudo cp systemd/gibbird-frame.service /etc/systemd/system/ && sudo systemctl enable --now gibbird-frame
+# Change User and paths if your user is not "pi".
+[Unit]
+Description=GibBird e-ink frame
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/gibbird
+ExecStart=/home/pi/gibbird/.venv/bin/gibbird -c /home/pi/gibbird/config.toml frame
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
