@@ -34,6 +34,12 @@ done
 systemctl daemon-reload
 systemctl enable gibbird-cam gibbird-frame
 
+# Let deploy.sh restart the services without a password (only these commands).
+SUDOERS=/etc/sudoers.d/gibbird
+for a in start stop restart; do echo "$U ALL=(root) NOPASSWD: /usr/bin/systemctl $a gibbird-cam gibbird-frame"; done > "$SUDOERS.tmp"
+chmod 440 "$SUDOERS.tmp"
+visudo -cf "$SUDOERS.tmp" >/dev/null && mv "$SUDOERS.tmp" "$SUDOERS"
+
 if [ "$REBOOT" = 1 ]; then
   echo "→ display interface changed: rebooting"
   systemd-run --on-active=3 systemctl reboot >/dev/null

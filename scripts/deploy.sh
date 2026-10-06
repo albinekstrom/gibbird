@@ -14,9 +14,14 @@ HOST=${GIBBIRD_HOST:-albin@birdframe.local}
 DIR=gibbird
 cd "$(dirname "$0")/.."
 
+# macOS often picks the Pi's IPv6 link-local address for .local names and then fails
+# with "Undefined error: 0"; IPv4 is reliable.
+SSH_OPTS="-o AddressFamily=inet -o ConnectTimeout=10"
+ssh() { command ssh $SSH_OPTS "$@"; }
+
 case "${1:-}" in
-  --logs) exec ssh -t "$HOST" "journalctl -f -u gibbird-cam -u gibbird-frame" ;;
-  --status) exec ssh "$HOST" "systemctl --no-pager status gibbird-cam gibbird-frame | grep -E '●|Active'; vcgencmd measure_temp" ;;
+  --logs) ssh -t "$HOST" "journalctl -f -u gibbird-cam -u gibbird-frame"; exit ;;
+  --status) ssh "$HOST" "systemctl --no-pager status gibbird-cam gibbird-frame | grep -E '●|Active'; vcgencmd measure_temp"; exit ;;
   --setup | "") ;;
   *) sed -n '2,10p' "$0"; exit 1 ;;
 esac
@@ -24,10 +29,10 @@ esac
 [ -f models/inat_bird_labels.txt ] || scripts/download_model.sh
 
 echo "→ syncing to $HOST:~/$DIR"
-ssh "$HOST" "command -v rsync >/dev/null || sudo apt-get install -y rsync"
+ssh "$HOST" "command -v rsync >/dev/null" || { echo "Install rsync on the Pi: sudo apt install rsync"; exit 1; }
 # Excluded paths are also protected from --delete, so the Pi's venv and data survive.
-rsync -az --delete --exclude-from=.deployignore ./ "$HOST:$DIR/"
-[ -f config.toml ] && rsync -az config.toml "$HOST:$DIR/config.toml"
+rsync -az --delete --exclude-from=.deployignore -e "ssh $SSH_OPTS" ./ "$HOST:$DIR/"
+if [ -f config.toml ]; then rsync -az -e "ssh $SSH_OPTS" config.toml "$HOST:$DIR/config.toml"; fi
 
 if [ "${1:-}" = --setup ]; then
   rc=0
@@ -49,7 +54,7 @@ if ! cmp -s pyproject.toml .venv/.installed-pyproject; then
   .venv/bin/pip install -q -e '.[cam,frame]' && cp pyproject.toml .venv/.installed-pyproject
 fi
 echo "→ restarting services"
-sudo systemctl restart gibbird-cam gibbird-frame
+sudo -n systemctl restart gibbird-cam gibbird-frame
 sleep 3
 systemctl --no-pager is-active gibbird-cam gibbird-frame || true
 EOF
