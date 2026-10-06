@@ -35,7 +35,7 @@ systemctl daemon-reload
 systemctl enable gibbird-cam gibbird-frame
 
 if [ "$REBOOT" = 1 ]; then
-  echo "→ display interface changed: rebooting in 5 s (run deploy.sh again afterwards)"
-  sleep 5
-  reboot
+  echo "→ display interface changed: rebooting"
+  systemd-run --on-active=3 systemctl reboot >/dev/null
+  exit 10  # tells deploy.sh to stop here
 fi

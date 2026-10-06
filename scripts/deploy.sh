@@ -30,7 +30,13 @@ rsync -az --delete --exclude-from=.deployignore ./ "$HOST:$DIR/"
 [ -f config.toml ] && rsync -az config.toml "$HOST:$DIR/config.toml"
 
 if [ "${1:-}" = --setup ]; then
-  ssh -t "$HOST" "sudo bash $DIR/scripts/pi_setup.sh"
+  rc=0
+  ssh -t "$HOST" "sudo bash $DIR/scripts/pi_setup.sh" || rc=$?
+  if [ "$rc" = 10 ]; then
+    echo "✓ setup done; the Pi is rebooting. Wait a minute, then run: scripts/deploy.sh"
+    exit 0
+  fi
+  [ "$rc" = 0 ] || exit "$rc"
 fi
 
 ssh "$HOST" bash -s <<EOF
