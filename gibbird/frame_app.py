@@ -68,7 +68,8 @@ class FrameApp:
         except (URLError, OSError, ValueError) as e:
             log.warning("bird camera unreachable: %s", e)
             if self._last_push is None:
-                poster = render_poster([], t["offline"], self.cfg.subtitle, t["offline2"], now, lang=self.cfg.language)
+                poster = render_poster([], t["offline"], self.cfg.subtitle, t["offline2"], now,
+                                       lang=self.cfg.language, size=self._size())
                 self._push(poster, "offline", now)
                 return True
             return False
@@ -86,7 +87,9 @@ class FrameApp:
             Tile(self._name(s), s["visits"], s["last_seen"], self._photo(s["photo"]))
             for s in species[: self.cfg.max_tiles]
         ] + [Tile(self._name(s), s["visits"], s["last_seen"], None) for s in species[self.cfg.max_tiles :]]
-        self._push(render_poster(tiles, title, self.cfg.subtitle, period, now, self.cfg.max_tiles, self.cfg.language), key, now)
+        poster = render_poster(tiles, title, self.cfg.subtitle, period, now,
+                               self.cfg.max_tiles, self.cfg.language, self._size())
+        self._push(poster, key, now)
         return True
 
     def run_forever(self) -> None:
@@ -96,6 +99,9 @@ class FrameApp:
             except Exception:
                 log.exception("frame update failed")
             time.sleep(self.cfg.poll_seconds)
+
+    def _size(self) -> tuple[int, int]:
+        return getattr(self.display, "poster_size", None) or tuple(self.cfg.poster_size)
 
     def _push(self, img: Image.Image, key: str, now: datetime) -> None:
         self.display.show(img)

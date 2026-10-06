@@ -55,6 +55,9 @@ class FrameConfig:
     poll_seconds: int = 120
     quiet_hours: tuple[int, int] = (23, 7)
     max_tiles: int = 9
+    # Poster size in pixels (portrait) for previews; on the Pi the panel's own size is used.
+    # Inky Impression 7.3": [480, 800]; 13.3": [1200, 1600].
+    poster_size: tuple[int, int] = (480, 800)
 
 
 @dataclass

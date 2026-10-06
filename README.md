@@ -55,7 +55,7 @@ Electrokit, Kjell & Company or Webhallen. Pimoroni and The Pi Hut ship to Sweden
 
 | Part | Notes | ≈ Price |
 |---|---|---|
-| Pimoroni Inky Impression 13.3" (2025 ed., Spectra 6) | 1600×1200, 6 colours, PCB is exactly A4 (297×210 mm) | £230 / $275 |
+| Pimoroni Inky Impression 7.3" (2025 ed., Spectra 6) | 800×480, 6 colours, board 174.2×123.2 mm, image area 160×96 mm. The 13.3" (1600×1200, A4) also works with the same code | £66–80 |
 | ~~Raspberry Pi~~ | **Already owned: Pi 4 Model B.** It runs the camera, classifier and display. A Pi 5 also fits the same hood | – |
 | 40-pin GPIO ribbon extension cable, **female → male**, 10–20 cm | Joins the Pi to the display header. Match pin 1 to pin 1 | 60 kr |
 | 4× M2.5×6 screws | Pi onto the printed bosses | 20 kr |

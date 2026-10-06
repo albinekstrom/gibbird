@@ -1,4 +1,4 @@
-"""Renders the "Seen Today" poster for the 13.3" Spectra 6 e-ink panel (1200x1600 portrait)."""
+"""Renders the "Seen Today" poster for Inky Spectra 6 e-ink panels (any size, portrait)."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
-SIZE = (1200, 1600)
+SIZE = (1200, 1600)  # 13.3" panel in portrait; the layout's reference size
 MARGIN = 70
 
 # Pure panel colours dither least, so text uses only these.
@@ -91,74 +91,87 @@ def render_poster(
     now: datetime | None = None,
     max_tiles: int = 9,
     lang: str = "en",
+    size: tuple[int, int] = SIZE,
 ) -> Image.Image:
+    """Draw the poster at `size` (portrait). The layout is designed at 1200 px wide and
+    scaled; small panels get relatively bigger text and at most 4 tiles."""
     now = now or datetime.now()
     t = text(lang)
-    img = Image.new("RGB", SIZE, BLACK)
-    d = ImageDraw.Draw(img)
-    W, H = SIZE
+    W, H = size
+    u = W / SIZE[0]
+    k = u * (1.3 if u < 0.6 else 1.0)  # text/spacing scale
 
-    _center(d, 70, subtitle, font("italic", 38), WHITE)
-    _center(d, 125, title.upper(), font("regular", 96), YELLOW, tracking=6)
-    _center(d, 250, period, font("italic", 34), WHITE)
-    d.line([(W / 2 - 120, 315), (W / 2 + 120, 315)], fill=YELLOW, width=3)
+    def px(v: float) -> int:
+        return max(1, round(v * k))
+
+    if W < 800:
+        max_tiles = min(max_tiles, 4)
+    img = Image.new("RGB", size, BLACK)
+    d = ImageDraw.Draw(img)
+    cx = W / 2
+
+    _center(d, px(70), subtitle, font("italic", px(38)), WHITE, cx)
+    _center(d, px(125), title.upper(), font("regular", px(96)), YELLOW, cx, tracking=px(6))
+    _center(d, px(250), period, font("italic", px(34)), WHITE, cx)
+    d.line([(cx - px(120), px(315)), (cx + px(120), px(315))], fill=YELLOW, width=px(3))
 
     shown = tiles[:max_tiles]
     if shown:
-        _grid(img, d, shown, top=360, bottom=H - 150, t=t)
+        _grid(img, d, shown, top=px(360), bottom=H - px(150), t=t, px=px)
     else:
-        _center(d, 760, t["empty"], font("italic", 64), WHITE)
-        _center(d, 850, t["empty2"], font("italic", 40), WHITE)
+        _center(d, H * 0.45, t["empty"], font("italic", px(64)), WHITE, cx)
+        _center(d, H * 0.45 + px(90), t["empty2"], font("italic", px(40)), WHITE, cx)
 
     visits = sum(tile.visits for tile in tiles)
     footer = f"{len(tiles)} {t['species']} · {visits} {t['visits_total']}"
     if tiles:
         footer += f" · {t['last']} {datetime.fromtimestamp(max(tile.last_seen for tile in tiles)):%H:%M}"
-    _center(d, H - 105, footer, font("regular", 32), WHITE)
-    _center(d, H - 58, f"{t['updated']} {now:%H:%M}", font("italic", 24), WHITE)
+    _center(d, H - px(105), _fit(d, footer, font("regular", px(32)), W - 2 * px(MARGIN)), font("regular", px(32)), WHITE, cx)
+    _center(d, H - px(58), f"{t['updated']} {now:%H:%M}", font("italic", px(24)), WHITE, cx)
     return img
 
 
-def _grid(img: Image.Image, d: ImageDraw.ImageDraw, tiles: list[Tile], top: int, bottom: int, t: dict) -> None:
+def _grid(img, d, tiles: list[Tile], top: int, bottom: int, t: dict, px) -> None:
+    W = img.width
     n = len(tiles)
     cols = 1 if n == 1 else 2 if n <= 4 else 3
     rows = math.ceil(n / cols)
-    gap = 40
-    text_h = 110 if cols == 1 else 90
-    cell_w = (SIZE[0] - 2 * MARGIN - (cols - 1) * gap) / cols
+    gap = px(40)
+    text_h = px(110 if cols == 1 else 90)
+    cell_w = (W - 2 * px(MARGIN) - (cols - 1) * gap) / cols
     cell_h = (bottom - top - (rows - 1) * gap) / rows
     side = int(min(cell_w, cell_h - text_h))
     # Rows are usually limited by width: centre the block vertically instead of spreading it.
     pitch = side + text_h + gap
     top += (bottom - top - (rows * pitch - gap)) / 2
-    name_font = font("bold", 56 if cols == 1 else 40 if cols == 2 else 32)
-    meta_font = font("italic", 34 if cols == 1 else 28 if cols == 2 else 24)
+    name_font = font("bold", px(56 if cols == 1 else 40 if cols == 2 else 32))
+    meta_font = font("italic", px(34 if cols == 1 else 28 if cols == 2 else 24))
+    frame_pad = px(4)
 
     for i, tile in enumerate(tiles):
         r, c = divmod(i, cols)
         # Centre a short last row.
         in_row = min(cols, n - r * cols)
         row_w = in_row * cell_w + (in_row - 1) * gap
-        x0 = (SIZE[0] - row_w) / 2 + c * (cell_w + gap)
+        x0 = (W - row_w) / 2 + c * (cell_w + gap)
         y0 = top + r * pitch
-        px = int(x0 + (cell_w - side) / 2)
-        py = int(y0)
+        x = int(x0 + (cell_w - side) / 2)
+        y = int(y0)
 
-        d.rectangle([px - 4, py - 4, px + side + 3, py + side + 3], outline=WHITE, width=2)
+        d.rectangle([x - frame_pad, y - frame_pad, x + side + frame_pad - 1, y + side + frame_pad - 1],
+                    outline=WHITE, width=px(2))
         if tile.photo is not None:
-            img.paste(ImageOps.fit(tile.photo.convert("RGB"), (side, side), Image.LANCZOS), (px, py))
+            img.paste(ImageOps.fit(tile.photo.convert("RGB"), (side, side), Image.LANCZOS), (x, y))
         else:
-            _center(d, py + side // 2 - 20, "?", font("italic", side // 3), WHITE, cx=px + side / 2)
+            _center(d, y + side // 2 - side // 6, "?", font("italic", side // 3), WHITE, x + side / 2)
 
         cx = x0 + cell_w / 2
-        name = _fit(d, tile.name, name_font, cell_w)
-        _center(d, py + side + 18, name, name_font, WHITE, cx=cx)
+        _center(d, y + side + px(18), _fit(d, tile.name, name_font, cell_w), name_font, WHITE, cx)
         meta = f"{tile.visits} {t['visit'] if tile.visits == 1 else t['visits']} · {datetime.fromtimestamp(tile.last_seen):%H:%M}"
-        _center(d, py + side + 18 + name_font.size + 10, meta, meta_font, YELLOW, cx=cx)
+        _center(d, y + side + px(28) + name_font.size, meta, meta_font, YELLOW, cx)
 
 
-def _center(d, y, text, f, fill, tracking: int = 0, cx: float | None = None) -> None:
-    cx = SIZE[0] / 2 if cx is None else cx
+def _center(d, y, text, f, fill, cx: float, tracking: int = 0) -> None:
     if not tracking:
         d.text((cx, y), text, font=f, fill=fill, anchor="ma")
         return

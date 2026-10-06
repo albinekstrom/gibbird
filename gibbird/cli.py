@@ -100,7 +100,8 @@ def cmd_demo(cfg: config_mod.Config, args) -> None:
         tiles.append(Tile(name, rng.randint(1, 9), now - rng.randint(0, 6 * 3600), img))
     tiles.sort(key=lambda t: -t.visits)
     f = cfg.frame
-    img = render_poster(tiles, f.title, f.subtitle, format_date(datetime.now(), f.language), lang=f.language)
+    img = render_poster(tiles, f.title, f.subtitle, format_date(datetime.now(), f.language),
+                        max_tiles=f.max_tiles, lang=f.language, size=tuple(args.size or f.poster_size))
     PreviewDisplay(args.out, simulate=not args.no_simulate).show(img)
     print(f"wrote {args.out}")
 
@@ -126,6 +127,7 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--photos", help="folder of bird photos to use in tiles")
     p.add_argument("--seed", type=int, default=1)
     p.add_argument("--no-simulate", action="store_true", help="skip the 6-colour dither preview")
+    p.add_argument("--size", type=int, nargs=2, metavar=("W", "H"), help="poster size, e.g. 480 800")
 
     sub.add_parser("regions", help="list bundled region species lists")
 

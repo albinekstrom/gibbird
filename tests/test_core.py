@@ -124,12 +124,13 @@ def test_watcher_allowlist_off_keeps_unknown_species(tmp_path):
     assert any(w.process(f) for f in _frames(1000, 40, bird_from=20))
 
 
+@pytest.mark.parametrize("size", [SIZE, (480, 800)])
 @pytest.mark.parametrize("n", [0, 1, 3, 7, 12])
-def test_render_poster(n):
+def test_render_poster(n, size):
     photo = Image.new("RGB", (300, 200), (120, 80, 40))
     tiles = [Tile(f"Bird number {i} with a long name", i + 1, 1_700_000_000, photo if i % 2 else None) for i in range(n)]
-    img = render_poster(tiles, "Seen Today", "Balcony Visitors", "Tuesday 6 October")
-    assert img.size == SIZE
+    img = render_poster(tiles, "Seen Today", "Balcony Visitors", "Tuesday 6 October", size=size)
+    assert img.size == size
 
 
 def test_quiet_hours():

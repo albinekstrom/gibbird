@@ -22,6 +22,8 @@ class InkyDisplay:
         from inky.auto import auto
 
         self._inky = auto(ask_user=False, verbose=True)
+        w, h = self._inky.resolution
+        self.poster_size = (min(w, h), max(w, h))  # we always draw in portrait
         self.rotation = rotation
         self.saturation = saturation
 

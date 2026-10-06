@@ -36,3 +36,4 @@ rotation = 90                 # use 270 if the poster comes out upside down
 saturation = 0.6
 min_refresh_minutes = 15      # e-ink refresh takes ~30 s; don't do it too often
 quiet_hours = [23, 7]         # no refreshes at night (the panel flashes)
+poster_size = [480, 800]      # previews only: 7.3" = [480, 800], 13.3" = [1200, 1600]
