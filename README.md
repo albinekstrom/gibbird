@@ -100,7 +100,7 @@ For either option, add:
 | IP65 junction box with a clear lid + cable gland + silica gel | Or put the camera indoors behind the balcony door glass. That avoids weather but you get reflections | 150–250 kr |
 | Feeder / perch | This is what brings the birds to the camera | 100–300 kr |
 
-**Total:** about 4,000–4,500 kr, since you already have the Pi. Most of it is the display.
+**Total:** about 2,500–3,000 kr with the 7.3" display and a USB camera, since you already have the Pi.
 
 ## 3D-printed back
 
