@@ -1,0 +1,64 @@
+# Birds plausible on a Gothenburg (Göteborg) balcony. Used as an allowlist:
+# predictions for species not listed here are ignored.
+# sci     = name exactly as in the model's label file (inat_bird_labels.txt)
+# aliases = other model labels that should count as this species (';'-separated),
+#           e.g. North American look-alikes the model sometimes picks instead.
+sci,en,local,aliases
+Parus major,Great Tit,Talgoxe,
+Cyanistes caeruleus,Blue Tit,Blåmes,
+Periparus ater,Coal Tit,Svartmes,
+Poecile palustris,Marsh/Willow Tit,Entita/talltita,Poecile atricapillus;Poecile carolinensis
+Aegithalos caudatus,Long-tailed Tit,Stjärtmes,
+Passer domesticus,House Sparrow,Gråsparv,Passer italiae
+Passer montanus,Tree Sparrow,Pilfink,
+Prunella modularis,Dunnock,Järnsparv,
+Fringilla coelebs,Chaffinch,Bofink,
+Fringilla montifringilla,Brambling,Bergfink,
+Chloris chloris,Greenfinch,Grönfink,
+Carduelis carduelis,Goldfinch,Steglits,
+Spinus spinus,Siskin,Grönsiska,Spinus pinus
+Acanthis flammea,Common Redpoll,Gråsiska,
+Carduelis cannabina,Linnet,Hämpling,
+Pyrrhula pyrrhula,Bullfinch,Domherre,
+Coccothraustes coccothraustes,Hawfinch,Stenknäck,
+Emberiza citrinella,Yellowhammer,Gulsparv,
+Emberiza schoeniclus,Reed Bunting,Sävsparv,
+Erithacus rubecula,Robin,Rödhake,
+Phoenicurus phoenicurus,Common Redstart,Rödstjärt,
+Phoenicurus ochruros,Black Redstart,Svart rödstjärt,
+Turdus merula,Blackbird,Koltrast,
+Turdus pilaris,Fieldfare,Björktrast,
+Turdus philomelos,Song Thrush,Taltrast,
+Turdus viscivorus,Mistle Thrush,Dubbeltrast,
+Sturnus vulgaris,Starling,Stare,
+Sitta europaea,Nuthatch,Nötväcka,
+Certhia familiaris,Treecreeper,Trädkrypare,Certhia americana
+Troglodytes troglodytes,Wren,Gärdsmyg,Troglodytes hiemalis;Troglodytes pacificus
+Regulus regulus,Goldcrest,Kungsfågel,Regulus satrapa
+Phylloscopus collybita,Chiffchaff,Gransångare,
+Sylvia atricapilla,Blackcap,Svarthätta,
+Muscicapa striata,Spotted Flycatcher,Grå flugsnappare,
+Ficedula hypoleuca,Pied Flycatcher,Svartvit flugsnappare,
+Motacilla alba,White Wagtail,Sädesärla,
+Bombycilla garrulus,Waxwing,Sidensvans,Bombycilla cedrorum
+Dendrocopos major,Great Spotted Woodpecker,Större hackspett,
+Picus viridis,Green Woodpecker,Gröngöling,
+Pica pica,Magpie,Skata,
+Garrulus glandarius,Jay,Nötskrika,
+Corvus monedula,Jackdaw,Kaja,
+Corvus cornix,Hooded Crow,Kråka,Corvus corone
+Corvus frugilegus,Rook,Råka,
+Corvus corax,Raven,Korp,
+Columba livia,Feral Pigeon,Tamduva,Columba livia domestica
+Columba palumbus,Wood Pigeon,Ringduva,
+Streptopelia decaocto,Collared Dove,Turkduva,
+Apus apus,Swift,Tornseglare,
+Delichon urbicum,House Martin,Hussvala,
+Hirundo rustica,Barn Swallow,Ladusvala,Hirundo rustica erythrogaster
+Larus argentatus,Herring Gull,Gråtrut,Larus argentatus smithsonianus
+Larus canus,Common Gull,Fiskmås,
+Chroicocephalus ridibundus,Black-headed Gull,Skrattmås,
+Larus fuscus,Lesser Black-backed Gull,Silltrut,
+Larus marinus,Great Black-backed Gull,Havstrut,
+Accipiter nisus,Sparrowhawk,Sparvhök,
+Falco tinnunculus,Kestrel,Tornfalk,
