@@ -61,9 +61,10 @@ Electrokit, Kjell & Company or Webhallen. Pimoroni and The Pi Hut ship to Sweden
 | 4× M2.5×6 screws | Pi onto the printed bosses | 20 kr |
 | Official Pi 4 USB-C power supply (5.1 V 3 A) | Use a mains extension cord to reach the socket, not a long USB-C cable | 100 kr |
 | microSD 32 GB **High Endurance** | It writes continuously | 150 kr |
-| A4 / 21×30 cm wooden frame | The back must be flat and about 20 mm wide so screws can go in. Check the rabbet depth | 150–300 kr |
-| 6× wood screws 3×12 mm countersunk, 2× M3×16 screws | M3 screws are the stand's hinge pins | 30 kr |
+| BGA "Galant" A4 frame (22.7×31.4 cm, acrylic) | The 3D model's defaults match it: 8 mm rabbet, 13 mm profile | 150 kr |
+| 6× wood screws 2.5×10 mm countersunk, 2× M3×16 screws | Pre-drill 1.5 mm, because the frame's back edge is only ~8 mm wide. The M3 screws are the stand's hinge pins | 30 kr |
 | Self-adhesive foam/felt strips, 2–3 mm | Press the display against the glass | 50 kr |
+| Black paper/card mask (optional) | The window is about 201×288 mm, so ~9 mm of the display's printed border shows at one end. A cut mask hides it | – |
 | ~300 g PETG or PLA | | |
 
 The fan from your case runs off GPIO pins 4 and 6, but the display ribbon takes the

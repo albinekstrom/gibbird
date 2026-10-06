@@ -17,13 +17,14 @@
 part = "assembly"; // [assembly, back, back_lower, back_upper, stand]
 
 /* [Frame: MEASURE YOURS] */
-frame_w = 251;        // outer width of the frame (portrait)
-frame_h = 338;        // outer height
+// Defaults: BGA "Galant" A4 frame (22.7 x 31.4 cm, 13 mm profile, 8 mm rabbet).
+frame_w = 227;        // outer width of the frame (portrait)
+frame_h = 314;        // outer height
 rabbet_w = 211;       // size of the opening on the back where the display sits
 rabbet_h = 298;
 // Depth from the frame's back face down to the display's back (PCB). If the display
 // sticks out behind the frame, use a deeper frame (or print spacer strips).
-display_recess = 2;
+display_recess = 2.5;  // 8 mm rabbet - ~2 mm acrylic - ~3.5 mm display
 
 /* [Display header: centre of the Inky's 40-pin header, from the rabbet's bottom-left] */
 hdr_x = 62;           // estimated from photos: measure yours!
@@ -48,8 +49,8 @@ csi_at = 45;
 plate_t = 3.2;
 corner_r = 4;
 wall = 2;
-screw_d = 3.4;        // wood screws 3 x 12 mm, countersunk
-screw_head_d = 6.6;
+screw_d = 2.9;        // wood screws 2.5 x 10 mm, countersunk (pre-drill 1.5 mm)
+screw_head_d = 5.2;
 
 /* [Stand] */
 stand_open = 35;      // how far the stand swings open (deg). More = leans back further.
@@ -67,12 +68,12 @@ block_w = 6;
 block_clear = 0.5;
 
 /* [Cables] */
-cable_xs = [172, 184];   // where power + camera cables run down (frame coordinates)
+cable_xs = [160, 172];   // where power + camera cables run down (frame coordinates)
 cable_d = 6;             // cable thickness the clips and foot arch are sized for
-clip_ys = [45, 85];
+clip_ys = [45, 120];
 
 /* [Split for printers smaller than the frame] */
-split_y = 100;        // seam height; keep it clear of the hood
+split_y = 85;        // seam height; keep it clear of the hood
 lap = 16;             // glued lap joint length
 
 /* [Hidden] */
