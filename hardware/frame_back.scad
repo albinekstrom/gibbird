@@ -7,9 +7,9 @@
 // The cover screws onto the back of the wooden frame (6 small wood screws). A vented
 // hood hides the Pi (Pi 4 and Pi 5 share the same footprint), which sits on 4 bosses next to an opening
 // over the display's 40-pin header; a short ribbon cable joins the two inside the hood.
-// The power and camera cables leave through the hood's right wall, run down in clips
-// and pass under the stand's foot. The stand folds flat around the hood and flips out
-// to a fixed angle.
+// The power and camera cables leave through the hood's right wall, are held by clips and
+// zip-tie anchors, and pass under the stand's foot. A 30 mm fan exhausts through the roof.
+// The stand folds flat around the hood and flips out to a fixed angle.
 //
 // Workflow: measure your frame + display, edit the [Frame] and [Display header] values,
 // pick a `part`, press F6 (render), then File > Export > STL.
@@ -41,9 +41,17 @@ plug_room = 20;       // room above the USB-A ports for a right-angle plug
 power_slot = [14, 10];   // USB-C power plug passes through (width along wall, height)
 usb_slot = [18, 12];     // USB camera cable (USB-A right-angle plug) passes through
 // Flat camera cable (Camera Module via CSI). Pi 4: connector 45 mm from the GPIO end.
-// Set csi_slot = [0, 0] to leave it out.
-csi_slot = [20, 6];
+// Set csi_slot = [20, 6] to add it; off by default (long runs use a USB camera).
+csi_slot = [0, 0];
 csi_at = 45;
+
+/* [Fan: 30 mm 5 V fan (e.g. the "Pi-Fan" from a Pi 4 case), exhausting through the roof] */
+fan = true;
+fan_size = 30;
+fan_t = 7;
+fan_hole_spacing = 24;
+fan_screw_d = 3.2;    // the fan's own screws go through the roof into the fan
+fan_at = [29, 32];    // over the SoC, in Pi board coordinates (Pi 4: SoC ~29 mm from the GPIO end)
 
 /* [Back plate] */
 plate_t = 3.2;
@@ -71,6 +79,7 @@ block_clear = 0.5;
 cable_xs = [160, 172];   // where power + camera cables run down (frame coordinates)
 cable_d = 6;             // cable thickness the clips and foot arch are sized for
 clip_ys = [45, 120];
+tie_ys = [36];           // zip-tie anchors on each cable path (plus one below each hood slot)
 
 /* [Split for printers smaller than the frame] */
 split_y = 85;        // seam height; keep it clear of the hood
@@ -102,6 +111,7 @@ function on_plate(p) = [board0.x + pi_board.x - p.y, board0.y + p.x];
 pi_holes = [for (x = [3.5, 61.5], y = [3.5, 52.5]) on_plate([x, y])];
 power_y = on_plate([11.2, 0]).y;
 csi_y = on_plate([csi_at, 0]).y;
+fan_c = on_plate(fan_at);
 usb_y = board0.y + pi_board.y + plug_room / 2;
 
 assert(hood_out0.x > leg_in0, "hood hits the left stand leg: move hdr_x or narrow the stand");
@@ -111,6 +121,7 @@ assert(hood_out1.y < hinge_y - hinge_r - bar_w, "hood hits the stand's top bar: 
 assert(hood_out0.y > hinge_y - stand_len + bar_w, "hood hits the stand's foot");
 assert(hood_out0.y > split_y + lap / 2, "split seam runs through the hood: lower split_y");
 assert(stand_w / 2 + block_clear + block_w < frame_w / 2, "stand too wide for the frame");
+assert(!fan || hood_in_h - boss_h - 1.6 - fan_t >= 8, "no room for the fan above the Pi's heatsinks");
 
 echo(str("stop tab ", tail, " mm; hood sticks out ", hood_in_h + wall, " mm behind the plate; ",
          "hood ", hood_out1 - hood_out0, " mm"));
@@ -136,10 +147,21 @@ module hood_cuts() {
     }
     translate([hdr.x - hdr_open.x / 2, hdr.y - hdr_open.y / 2, -1]) cube([hdr_open.x, hdr_open.y, plate_t + 2]);
     for (p = pi_holes) translate([p.x, p.y, plate_t]) cylinder(d = boss_hole_d, h = boss_h + 1);
-    // roof vents over the Active Cooler, low vents in the bottom wall
-    for (i = [0 : 3])
-        translate([board0.x + 6 + i * 12, board0.y + 10, plate_t + hood_in_h - 1])
-            cube([5, pi_board.y - 20, wall + 2]);
+    // roof: fan grille + screw holes (or plain vents), low intake vents in the bottom wall
+    roof_z = plate_t + hood_in_h - 1;
+    if (fan) {
+        translate([fan_c.x, fan_c.y, roof_z]) {
+            intersection() {
+                cylinder(d = fan_size - 2, h = wall + 2);
+                for (i = [-3 : 3]) translate([i * 4 - 1.25, -fan_size / 2, 0]) cube([2.5, fan_size, wall + 2]);
+            }
+            for (sx = [-1, 1], sy = [-1, 1])
+                translate([sx * fan_hole_spacing / 2, sy * fan_hole_spacing / 2, 0]) cylinder(d = fan_screw_d, h = wall + 2);
+        }
+    } else {
+        for (i = [0 : 3])
+            translate([board0.x + 6 + i * 12, board0.y + 10, roof_z]) cube([5, pi_board.y - 20, wall + 2]);
+    }
     for (i = [0 : 4])
         translate([hood_in0.x + 8 + i * 14, hood_out0.y - 1, plate_t + 3]) cube([7, wall + 2, 8]);
     // cable slots in the right wall: USB-C power next to its port, camera ribbon, USB at the top
@@ -173,6 +195,14 @@ module cable_clip(x, y) {
     }
 }
 
+module tie_anchor(x, y) {
+    // bridge with a tunnel for a zip tie (up to 3.6 mm wide) that wraps the cable
+    translate([x - 5, y - 3, plate_t - eps]) difference() {
+        cube([10, 6, 3.5]);
+        translate([-1, 1, -1]) cube([12, 4, 2.8]);
+    }
+}
+
 module back() {
     difference() {
         union() {
@@ -180,6 +210,7 @@ module back() {
             hood();
             hinge_blocks();
             for (x = cable_xs, y = clip_ys) cable_clip(x, y);
+            for (x = cable_xs, y = concat(tie_ys, [power_y - 14])) tie_anchor(x, y);
         }
         hood_cuts();
         hinge_holes();

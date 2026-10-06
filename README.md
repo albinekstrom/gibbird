@@ -67,34 +67,31 @@ Electrokit, Kjell & Company or Webhallen. Pimoroni and The Pi Hut ship to Sweden
 | Black paper/card mask (optional) | The window is about 201×288 mm, so ~9 mm of the display's printed border shows at one end. A cut mask hides it | – |
 | ~300 g PETG or PLA | | |
 
-The fan from your case runs off GPIO pins 4 and 6, but the display ribbon takes the
-whole header. Start without the fan; the heatsinks and hood vents should be enough
-because the Pi only classifies when something moves. Check `vcgencmd measure_temp`.
-If it goes above about 75 °C, add a 40-pin GPIO 1-to-2 splitter so the fan can
-plug in next to the ribbon.
+**Fan.** The hood has a mount for a 30 mm fan (like the "Pi-Fan" from your Pi 4
+case). It sits over the processor and blows out through a grille in the roof, and air
+comes in through vents in the bottom wall. The display ribbon cable uses the whole
+GPIO header, so power the fan from a spare USB port with a **USB‑A → 2‑pin fan cable**
+(≈30 kr) instead of from GPIO pins 4 and 6.
 
-**Camera (balcony)**
+**Camera (balcony), 3–5 m from the Pi**
 
-A wide-angle camera sees the whole balcony, but each bird takes up fewer pixels.
-Roughly, for a 12 cm bird:
+The Pi's own flat camera cable can't go that far. A wide-angle USB camera works well:
+USB 2.0 is specified for cables up to 5 m, and the camera gets its power through the
+same cable.
 
-| Camera | Field of view | Bird at 1 m | at 2 m | at 3 m |
-|---|---|---|---|---|
-| Camera Module 3 **Wide**, full 12 MP | 102° horizontal | ~230 px | ~110 px | ~75 px |
-| Camera Module 3 (standard), full 12 MP | 66° | ~420 px | ~210 px | ~140 px |
-| 1080p USB webcam, ~78° | 78° | ~140 px | ~70 px | ~45 px |
-
-The classifier looks at 224×224 px crops. It's reliable from about 100 px and gets
-poor below about 60 px. With the Wide camera, keep the feeder or perch within about
-2 m. Birds further away will be detected, but often not identified.
-
-Recommended: **Camera Module 3 Wide** (≈350 kr), with the cable chosen by distance.
-
-| Distance Pi → camera | Cable | ≈ Price |
+| Part | Notes | ≈ Price |
 |---|---|---|
-| up to ~1 m | Standard 15-pin camera ribbon cable (Pi 4 uses the full-size connector), 1 m | 50 kr |
-| further (through a wall or door) | CSI-to-HDMI extension kit (e.g. Arducam) + flat HDMI cable. Check it lists Camera Module 3 | 300–400 kr |
-| alternative | 1080p USB webcam + **active** USB extension 5–10 m. Simpler, but lower resolution (see above) | 700–1,000 kr |
+| Wide-angle **4K (8 MP) USB camera**, UVC with MJPEG, ~100–120° lens | E.g. an ELP or Arducam module with a Sony IMX415 or IMX317 sensor. Autofocus is a bonus but not needed at 1–3 m | 500–900 kr |
+| **USB 2.0 extension cable, 5 m** (flat if it has to pass a door or window seal) | Up to 5 m works without an amplifier. For longer runs, use an **active** USB repeater cable (5–10 m) | 100–200 kr |
+| Right-angle USB-A adapter | So the plug turns sideways inside the hood's top plug space | 30 kr |
+
+What a 4K wide camera sees of a 12 cm bird: ~190 px at 1 m, ~95 px at 2 m, ~65 px
+at 3 m. The classifier is reliable from about 100 px, so keep the feeder within about
+2 m of the camera.
+
+Other options: **Camera Module 3 Wide** gives a better picture, but it only works on
+a short CSI ribbon (≤ 1 m). You could also put a small Pi Zero 2 W next to the camera
+and send pictures over Wi-Fi, but that means a second computer to look after.
 
 For either option, add:
 
@@ -117,10 +114,16 @@ Customizer panel.
 - **Pi hood.** The Pi (4 or 5) is screwed flat onto four bosses inside a vented hood
   (90×115 mm, 27 mm deep). Its GPIO edge faces an opening over the display's 40-pin
   header, so a short ribbon cable joins the two inside the hood. The hood has roof
-  vents over the cooler and low vents in the bottom wall. Three slots in the right wall let
-  the USB-C power plug, the flat camera cable and a USB plug pass through.
-- **Cables.** Snap-in clips guide both cables down to the bottom edge, and they
-  pass under an arch in the stand's foot.
+  vents over the cooler and low vents in the bottom wall. Slots in the right wall let the
+  USB-C power plug and the camera's USB plug pass through. A slot for a flat
+  camera ribbon can be turned on with `csi_slot`.
+- **Fan.** A 30 mm fan mount (4 screw holes and a grille) in the roof, over the
+  processor. Intake vents are in the bottom wall.
+- **Cables.** Power and camera cables leave through slots in the right wall. Zip-tie
+  anchors just below the slots act as strain relief, so a tug on the cable doesn't pull
+  on the Pi. Snap-in clips and more anchors guide both cables down to the bottom
+  edge, under an arch in the stand's foot. The fan's USB cable and the display ribbon
+  stay inside the hood.
 - **Flip-out stand.** A rectangular stand that folds flat around the hood. It pivots
   on two M3×16 screws that self-tap into the hinge blocks. A small stop tab behind the
   hinge sets the opening angle (`stand_open`, default 35°). The tab length is

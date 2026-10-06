@@ -73,6 +73,8 @@ def _opencv_frames(src: int | str, cfg: CamConfig, is_file: bool) -> Iterator[Fr
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, cfg.main_size[1])
         cap.set(cv2.CAP_PROP_FPS, cfg.framerate)
         cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
+        # Always hand us the newest frame: decoding 4K MJPEG is slower than the camera.
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         logging.getLogger(__name__).info(
             "USB camera running at %dx%d",
             cap.get(cv2.CAP_PROP_FRAME_WIDTH),
