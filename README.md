@@ -10,14 +10,14 @@ names and a Swedish poster. Everything that depends on location sits in one regi
 file, so you can make a list for anywhere else (see [Other locations](#other-locations)).
 
 ```
- BALCONY                 camera cable           BEDROOM (hidden behind the frame)
- ┌──────────────────┐   ─────────────────────▶ ┌────────────────────────────────┐
- │ Camera Module 3  │   (CSI, CSI→HDMI kit,    │ Raspberry Pi 4 (or 5)          │
- │ Wide in a        │    or USB webcam)        │  gibbird cam:   motion → crop  │
- │ weatherproof box │                          │                 → classify     │
- └──────────────────┘                          │  gibbird frame: poster → Inky  │
-                                               │ ribbon cable → Inky 13.3" panel│
-                                               └────────────────────────────────┘
+ BALCONY (outside the office window)            OFFICE (hidden behind the frame)
+ ┌────────────────────────┐  2–3 m USB cable   ┌──────────────────────────────────┐
+ │ IMX678 USB camera, 123°│ ─────────────────▶ │ Raspberry Pi 4                   │
+ │ in a printed housing,  │                    │  gibbird cam:   motion → crop    │
+ │ strapped to a railing  │                    │                 → classify       │
+ │ post                   │                    │  gibbird frame: poster → driver  │
+ └────────────────────────┘                    │  HAT → Waveshare 7.3" e-ink panel│
+                                               └──────────────────────────────────┘
 ```
 
 ## Step-by-step
@@ -26,25 +26,25 @@ file, so you can make a list for anywhere else (see [Other locations](#other-loc
 camera, feeder and cables go (office window + balcony), plus the weatherproof camera
 housing (`hardware/camera_housing.scad`).
 
-1. **Buy the parts** (list below). Also get a feeder or perch about 0.5–1.5 m from
-   where the camera will sit. The classifier needs the bird to fill a good part of
-   the picture. A bird flying past at 5 m will not be identified.
-2. **Pick and measure the frame.** Measure its outer size, the rabbet (the opening on
-   the back where the display goes), how deep the display sits below the back face,
-   and where the display's 40-pin header is.
-3. **Print the back.** Enter your measurements in `hardware/frame_back.scad` and export
-   `back_lower`, `back_upper` and `stand` (see [3D print](#3d-printed-back)).
+1. **Buy the parts** (list below). Also get a feeder for the railing and place it
+   about 1.2–1.5 m from the camera. The classifier needs the bird to fill a good part
+   of the picture.
+2. **Frame:** BGA "Ram Galant Glas" 13×18 cm. The 3D model's defaults match it. If you
+   use another frame, measure its outer size, the recess (`rabbet`) and its depth.
+3. **Print** `back`, `panel_tray`, `pod_cover` and `stand` from `hardware/frame_back.scad`,
+   and `body`, `lid` and `bracket` from `hardware/camera_housing.scad`
+   (see [3D print](#3d-printed-back)).
 4. **Flash the SD card** with Raspberry Pi Imager → *Raspberry Pi OS Lite (64-bit)*.
    In the Imager settings, set Wi-Fi, enable SSH, and use the hostname `birdframe`.
-5. **Build the frame.** Put the display face-down in the frame with foam strips on
-   top. Take the Pi 4 out of its aluminium case (keep the stick-on heatsinks) and screw
-   it onto the four bosses in the printed back.
-   Plug the ribbon cable into the display header, then screw the back onto the frame
-   and plug the other end into the Pi. Run the power and camera cables out through the
-   hood's right wall, along the clips, and under the stand's foot.
-6. **Mount the camera** in a weatherproof box, high in a corner so it sees the whole
-   balcony, with the feeder no more than about 2 m away. Run the cable inside along
-   the balcony door seal and into the hood.
+5. **Build the frame.** Glass → passepartout → display panel → printed panel tray, in
+   that order, into the frame. Feed the panel's flat cable through the tray's slot.
+   Take the Pi 4 out of its aluminium case (keep the stick-on heatsinks), screw it onto
+   the four bosses in the printed back, and plug the driver HAT onto it. Then connect
+   the flat cable to the HAT and screw the back onto the frame. Power and camera cables
+   leave through the spine at the bottom edge.
+6. **Mount the camera** on a railing post next to the office window, with two hose
+   clamps (see [docs/INSTALLATION.md](docs/INSTALLATION.md)). Run the cable along the
+   window frame, in through the window seal, and up the spine.
 7. **Install the software** ([Software](#software)). Use `gibbird classify` on a few
    photos and check the web page at `http://birdframe.local:8080`.
 8. **Calibrate** at `http://birdframe.local:8080/calibrate` ([below](#zones-and-calibration)).
@@ -56,8 +56,8 @@ This is the current build: a Pi 4 behind a Waveshare 7.3" e-ink panel, and an IM
 USB camera outside the office window. Prices are from amazon.se, October 2026.
 
 **Already owned:** Raspberry Pi 4 Model B with its fan and heatsinks, the official Pi 4
-USB-C power supply, a microSD 32 GB High Endurance card, and a picture frame. The 3D
-model still has to be sized for that frame.
+USB-C power supply, a microSD 32 GB High Endurance card, and the BGA "Ram Galant Glas"
+13×18 cm frame (walnut).
 
 **Main parts**
 
@@ -75,7 +75,8 @@ model still has to be sized for that frame.
 | Screw kit M2.5 + M3 (stainless) | Pi 4× M2.5×6, pod cover 4× M3×10 countersunk, stand 2× M3×16 | 100–200 kr |
 | 6× wood screws 2.5×10 mm countersunk | Back plate to the frame (pre-drill 1.5 mm) | 30–50 kr |
 | Self-adhesive foam/felt pads, 2–3 mm | Support the thin glass display panel evenly | 50–80 kr |
-| PLA or PETG filament, ~300 g | For the indoor frame back | – |
+| PLA or PETG filament, ~300 g | For the indoor frame back and panel tray | – |
+| Passepartout, white or black, 13×18 cm outer, window about **95×159 mm** | Hides the panel's border; window just inside the image area (160×96 mm). BGA's made-to-measure mat (179,90 kr), or cut black card yourself. Measure the panel first | 0–180 kr |
 
 **For the camera outside**
 
@@ -107,42 +108,46 @@ Customizer panel.
 
 The back is one clean central column, and nothing else is visible:
 
-- **Pod.** Hides the Pi (4 or 5). The Pi screws onto four bosses on the plate, next
-  to an opening over the display's 40-pin header, and a short ribbon cable joins them
-  inside. The pod **cover** is a separate part, printed roof-down for a smooth finish
-  with no sagging spans. It comes off with 4 screws that are hidden under the stand,
-  so you can reach the Pi without taking the back off the frame.
-- **Fan.** A 30 mm fan mount and grille in the cover's roof, over the processor. Air
-  comes in through slots in the cover's bottom wall.
-- **Spine.** A hollow channel from the pod down to the bottom edge. The power and
-  camera cables run inside it, so no clips, zip ties or loose cables show. Use a
-  **90° (angled) USB-C power cable**: there are 14 mm beside the Pi for the plug.
+- **Inside the frame:** glass → passepartout → **display panel** → **panel tray**. The
+  tray is printed and holds the thin glass panel centred, supports its whole back
+  (put a thin layer of foam in its pocket), and fills the rest of the 9 mm recess, so
+  the back plate presses on it when screwed on.
+- **Pod.** Hides the Pi (4 or 5) with the Waveshare driver HAT. The Pi screws onto four
+  bosses on the plate. The pod **cover** is a separate part, printed roof-down for a
+  smooth finish with no sagging spans. It comes off with 4 screws that are hidden
+  under the stand, so you can reach the Pi without taking the back off the frame.
+- **Fan.** A 30 mm fan mount and grille in the cover's roof, placed clear of the
+  driver HAT. Air comes in through slots in the cover's bottom wall.
+- **Spine.** A hollow channel from the pod down to the bottom edge, sloping down so the
+  frame can lean back on its stand without the pod touching the table. The panel's
+  flat cable comes up through a slot into the spine and runs inside it to the HAT. The
+  power and camera cables leave through the spine at the bottom edge. Use a **90° USB‑C
+  adapter**: there are 20 mm beside the Pi for the plug.
 - **Stand.** A solid flap that closes over the pod and spine, so from behind the frame
   looks like a slab with one neat block on it. It has vent slots over the fan. It
   pivots on two M3×16 screws in towers at the top of the pod, and a stop tab sets the
   angle (`stand_open`, default 35°).
-- **Plate.** Rounded corners and softened edges. It screws onto the frame with 6 small
-  countersunk screws. On a 256 mm print bed it's printed in two halves, joined by a
-  glued lap joint. The joint lines up with a thin groove, so it reads as a design line
-  rather than a seam.
+- **Plate.** 147×197 mm with rounded corners and softened edges, printed in one piece.
+  It screws onto the frame with 6 small countersunk screws (2.5×10, pre-drill 1.5 mm).
+  For a bigger frame, set `split_y` and print it in two glued halves.
 
-**Assembly:** glue the plate halves → screw the Pi onto the bosses → plug the ribbon
-into the Pi → thread the power and camera cables up through the spine and plug them
-in → put the display face-down in the frame with foam strips → plug the ribbon into
-the display header, lower the plate and screw it to the frame → screw the fan into
-the cover and plug its USB lead into the Pi → screw on the cover (4× M3×10) → fit
-the stand (2× M3×16).
+**Assembly:** panel and tray into the frame (flat cable through the tray's slot) →
+screw the Pi onto the bosses → plug the driver HAT onto the Pi (with its extension
+header) → thread the power and camera cables up through the spine and plug them in
+→ connect the panel's flat cable to the HAT → screw the back onto the frame → screw
+the fan into the cover and plug its USB lead into the Pi → screw on the cover
+(4× M3×10) → fit the stand (2× M3×16).
 
-Measure these before printing: `frame_w/h`, `rabbet_w/h`, `display_recess`, and the
-display header centre `hdr_x/hdr_y`. The header centre is measured from the bottom-left
-of the rabbet, looking at the **back**, with the frame in portrait. The default
-(62, 137) is only an estimate from the video. The Pi's position is worked out from
-the header position. The file refuses to render if the display header ends up outside the pod or under
-the Pi, or if the seam runs through the pod. The `stl/` folder has exports made with the default numbers,
-so treat them as a test print only.
+**Check when the display arrives:** the panel's outline (`panel`, default 111.2×170.2 mm),
+its thickness, which edge the flat cable leaves from (`fpc_edge`, default bottom), and
+the cable's width and length. If the cable is too short to reach the driver HAT, a
+24-pin 0.5 mm FPC extension solves it. The file refuses to render if the cable slot
+doesn't open into the spine or pod, if the slot is under the Pi, if the panel doesn't
+fit the frame, or if the fan would sit over the HAT. The `stl/` folder has exports
+made with the default numbers.
 
-No part needs supports: plate halves flat side down, cover roof down, stand pod-side
-down. Use 0.2 mm layers, 3 walls and 15 % infill. PETG handles a warm windowsill
+No part needs supports: plate and panel tray flat side down, cover roof down, stand
+pod-side down. Use 0.2 mm layers, 3 walls and 15 % infill. PETG handles a warm windowsill
 better than PLA. A matte or silk filament in one colour gives the cleanest look.
 
 ## Software

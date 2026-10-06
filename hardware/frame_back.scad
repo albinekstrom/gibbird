@@ -1,5 +1,5 @@
-// GibBird — back cover v2 for a picture frame holding a Pimoroni Inky Impression,
-// with a Raspberry Pi 4/5 hidden behind it.
+// GibBird — back cover v2 for a picture frame holding a Waveshare 7.3" e-Paper (E) panel,
+// with a Raspberry Pi 4/5 (+ the Waveshare driver HAT) hidden behind it.
 //
 // Coordinates are seen FROM THE BACK with the frame standing in portrait.
 // Origin = bottom-left corner of the frame's back face, Z points away from the display.
@@ -9,39 +9,51 @@
 // out to the bottom edge, and a solid flip-out stand closes over both, so from behind
 // the frame looks like a slab with a single neat block on it.
 //
+// Inside the frame, front to back: glass, passepartout (mat), display panel, and a printed
+// tray that holds the thin glass panel centred and supports its whole back. The tray fills
+// the rest of the frame's recess, so the back plate presses on it when screwed on.
+//
 // Parts and print orientation (all without supports):
-//   back_lower, back_upper  plate halves, flat side down; glue the lap joint
-//                           (or `back` in one piece if your bed is big enough)
+//   back                    flat side down (frames up to ~250 mm fit in one piece;
+//                           bigger ones: set split_y and print back_lower + back_upper)
+//   panel_tray              flat side down
 //   pod_cover               roof down (a textured plate gives a nice finish)
 //   stand                   pod side down
 //
 // Workflow: measure your frame + display, edit the [Frame] and [Display header] values,
 // pick a `part`, press F6 (render), then File > Export > STL.
 
-part = "assembly"; // [assembly, back, back_lower, back_upper, pod_cover, stand]
+part = "assembly"; // [assembly, back, back_lower, back_upper, panel_tray, pod_cover, stand]
 
 /* [Frame: MEASURE YOURS] */
-// Defaults: BGA "Galant" A4 frame (22.7 x 31.4 cm, 13 mm profile, 8 mm rabbet).
-frame_w = 227;        // outer width of the frame (portrait)
-frame_h = 314;        // outer height
-rabbet_w = 211;       // opening on the back where the display sits
-rabbet_h = 298;
-display_recess = 2.5; // frame back face -> display back (8 mm rabbet - acrylic - display)
+// Defaults: BGA "Ram Galant Glas" 13x18 cm (14.7 x 19.7 cm outside, 13 mm profile, 9 mm recess).
+frame_w = 147;        // outer width of the frame (portrait)
+frame_h = 197;        // outer height
+rabbet_w = 131;       // recess on the back where the picture goes (13x18 cm + play)
+rabbet_h = 181;
+rabbet_depth = 9;     // "falsdjup"
+glass_t = 2;
+mat_t = 1.4;          // passepartout; 0 if you don't use one
 
-/* [Display header: centre of the Inky's 40-pin header, from the rabbet's bottom-left] */
-hdr_x = 62;           // estimated: measure yours!
-hdr_y = 137;
-hdr_open = [16, 66];  // opening for header + ribbon plug (header runs vertically)
+/* [Display panel: Waveshare 7.3" e-Paper (E), portrait. CHECK when it arrives] */
+panel = [111.2, 170.2];  // outline of the glass panel
+panel_t = 1.2;
+panel_shift = [0, 0];    // move the panel off-centre in the recess (mm)
+fpc_edge = "bottom";     // edge where the flat cable leaves the panel: bottom|top|left|right
+fpc_w = 26;              // width of the flat cable
+fpc_pos = 0;             // cable position along that edge, from its centre (mm)
 
 /* [Pod: hides the Raspberry Pi] */
 pod_w = 110;
-pod_y0 = 98;          // bottom edge of the pod, frame coordinates
-cable_room = 14;      // inside the pod, right of and below the Pi, for cables
+pod_y0 = 26;          // bottom edge of the pod, frame coordinates. High enough that the pod
+                      // doesn't touch the table when the frame leans back on its stand.
+cable_room = 20;      // inside the pod, right of and below the Pi, for cables
 plug_room = 20;       // above the USB-A ports, for a right-angle plug
 boss_h = 4;           // Pi stands this far above the plate (M2.5 x 6 screws)
 boss_d = 6;
 boss_hole_d = 2.2;
-pi_tall = 16;         // tallest part above the Pi's board
+pi_tall = 24;         // tallest part above the Pi's board (driver HAT on its extension header)
+hat = [65, 30];       // driver HAT footprint, lying along the Pi's GPIO edge
 wall = 2.4;
 roof_t = 2.4;
 radius = 6;           // corner radius of plate, pod and stand
@@ -55,10 +67,12 @@ fan_size = 30;
 fan_t = 7;
 fan_hole_spacing = 24;
 fan_screw_d = 3.2;
-fan_at = [29, 32];    // in Pi board coordinates (Pi 4 SoC ~29 mm from the GPIO end)
+fan_at = [45, 10];    // in Pi board coordinates; kept clear of the driver HAT, which covers
+                      // the SoC side of the board, and blowing down past it
 
-/* [Spine: hollow channel for the cables] */
-spine_w = 34;
+/* [Spine: hollow channel for the cables (and the panel's flat cable)] */
+spine_w = 40;
+spine_low = 12;       // height at the bottom edge; slopes up to the pod so the frame can lean back
 
 /* [Back plate] */
 plate_t = 3.2;
@@ -77,7 +91,7 @@ pin_tap_d = 2.8;      // ...which self-taps into the hinge tower
 pin_depth = 12;
 
 /* [Split for printers smaller than the frame] */
-split_y = 85;
+split_y = 0;          // 0 = print the plate in one piece
 lap = 16;
 
 /* [Hidden] */
@@ -86,7 +100,17 @@ eps = 0.01;
 pi_board = [56, 85];  // Pi lying vertically: GPIO edge left, USB-C right, USB-A at top
 m_x = (frame_w - rabbet_w) / 2;
 m_y = (frame_h - rabbet_h) / 2;
-hdr = [m_x + hdr_x, m_y + hdr_y];
+tray_t = rabbet_depth - glass_t - mat_t - 0.3;   // tray fills the recess behind the panel
+panel0 = [m_x + (rabbet_w - panel.x) / 2, m_y + (rabbet_h - panel.y) / 2] + panel_shift;
+panel1 = panel0 + panel;
+// Slot for the panel's flat cable, just inside the edge it leaves from.
+slot_l = fpc_w + 6;
+slot_d = 8;
+hdr = fpc_edge == "bottom" ? [(panel0.x + panel1.x) / 2 + fpc_pos, panel0.y + slot_d / 2 + 1]
+    : fpc_edge == "top"    ? [(panel0.x + panel1.x) / 2 + fpc_pos, panel1.y - slot_d / 2 - 1]
+    : fpc_edge == "left"   ? [panel0.x + slot_d / 2 + 1, (panel0.y + panel1.y) / 2 + fpc_pos]
+    :                        [panel1.x - slot_d / 2 - 1, (panel0.y + panel1.y) / 2 + fpc_pos];
+hdr_open = fpc_edge == "bottom" || fpc_edge == "top" ? [slot_l, slot_d] : [slot_d, slot_l];
 pod_cx = frame_w / 2;
 pod_x0 = pod_cx - pod_w / 2;
 pod_x1 = pod_cx + pod_w / 2;
@@ -111,13 +135,19 @@ cover_bosses = [for (x = [pod_in_x0 + 3.5, pod_in_x1 - 3.5], y = [pod_in_y0 + 3.
 hdr0 = hdr - hdr_open / 2;
 hdr1 = hdr + hdr_open / 2;
 
-assert(hdr0.x >= pod_in_x0 && hdr1.x <= pod_in_x1 && hdr0.y >= pod_in_y0 && hdr1.y <= pod_in_y1,
-       "the display header must lie inside the pod: move pod_y0 or widen pod_w");
-assert(hdr1.x + 2 < board0.x, "the display header is under the Pi: widen pod_w");
+in_spine = hdr0.x >= pod_cx - spine_w / 2 + wall && hdr1.x <= pod_cx + spine_w / 2 - wall && hdr1.y <= pod_y0;
+in_pod = hdr0.x >= pod_in_x0 && hdr1.x <= pod_in_x1 && hdr0.y >= pod_in_y0 && hdr1.y <= pod_in_y1;
+assert(in_spine || in_pod, "the panel's cable slot must open into the spine or the pod: check fpc_edge/pod_y0");
+assert(hdr1.x + 2 < board0.x || hdr0.x - 2 > board0.x + pi_board.x || hdr1.y + 2 < board0.y
+       || hdr0.y - 2 > board0.y + pi_board.y, "the cable slot is under the Pi: raise cable_room");
+assert(tray_t > panel_t + 1.5, "the frame's recess is too shallow for glass + mat + panel + tray");
+assert(panel.x < rabbet_w && panel.y < rabbet_h, "the panel doesn't fit in the frame's recess");
+// The fan must not sit over the driver HAT (HAT: GPIO edge = board y 56, inwards by hat.y).
+assert(!fan || fan_at.y + fan_size / 2 < pi_board.x - hat.y, "fan is over the driver HAT: move fan_at");
 for (b = cover_bosses)
     assert(b.x + 3.5 < hdr0.x || b.x - 3.5 > hdr1.x || b.y + 3.5 < hdr0.y || b.y - 3.5 > hdr1.y,
            "a cover screw boss is over the display header opening");
-assert(split_y + lap / 2 < pod_y0, "the split seam runs through the pod: lower split_y");
+assert(split_y == 0 || split_y + lap / 2 < pod_y0, "the split seam runs through the pod: lower split_y");
 assert(hinge_y1 < frame_h - 5, "the stand hinge is above the top of the frame");
 assert(!fan || pod_in_h - boss_h - 1.6 - fan_t >= 8, "no room for the fan above the Pi's heatsinks");
 
@@ -163,8 +193,11 @@ module back() {
     difference() {
         union() {
             soft_block([0, 0], [frame_w, frame_h], 0, plate_t);
-            // spine: hollow cable channel from the pod to the bottom edge
-            soft_block([pod_cx - spine_w / 2, 0], [pod_cx + spine_w / 2, pod_y0 - 0.3], 0, top_z, r = 2);
+            // spine: hollow cable channel from the pod down to the bottom edge, sloping
+            hull() {
+                soft_block([pod_cx - spine_w / 2, 0], [pod_cx + spine_w / 2, 1], 0, spine_low, r = 0.5);
+                soft_block([pod_cx - spine_w / 2, pod_y0 - 2.3], [pod_cx + spine_w / 2, pod_y0 - 0.3], 0, top_z, r = 0.5);
+            }
             // hinge base above the pod, with a tower at each end for the stand's pivots
             soft_block([pod_x0, pod_y1 + 0.3], [pod_x1, hinge_y1], 0, top_z, round = [0, 0, 1, 1]);
             for (x = [pod_x0, pod_x1 - knuckle_w])
@@ -183,8 +216,10 @@ module back() {
                 }
         }
         // spine tunnel, open at the bottom edge and into the pod
-        translate([pod_cx - spine_w / 2 + wall, -1, plate_t])
-            cube([spine_w - 2 * wall, pod_y0 + 2, top_z - roof_t - plate_t]);
+        hull() {
+            translate([pod_cx - spine_w / 2 + wall, -1, plate_t]) cube([spine_w - 2 * wall, 1, spine_low - roof_t - plate_t]);
+            translate([pod_cx - spine_w / 2 + wall, pod_y0, plate_t]) cube([spine_w - 2 * wall, 1, top_z - roof_t - plate_t]);
+        }
         translate([pod_cx - spine_w / 2 + wall, pod_in_y0 - 1, plate_t - 1]) cube([spine_w - 2 * wall, 4, 3]);
         // display header opening
         translate([hdr0.x, hdr0.y, -1]) cube([hdr_open.x, hdr_open.y, plate_t + 2]);
@@ -194,7 +229,7 @@ module back() {
         translate([pod_x0 - 1, axis_y, axis_z]) rotate([0, 90, 0]) cylinder(d = pin_tap_d, h = pod_w + 2);
         screw_positions() countersunk(screw_d, screw_head_d, plate_t);
         // the glue seam becomes a deliberate design line
-        translate([-1, split_y - lap / 2 - 0.6, plate_t - 0.6]) cube([frame_w + 2, 1.2, 1]);
+        if (split_y > 0) translate([-1, split_y - lap / 2 - 0.6, plate_t - 0.6]) cube([frame_w + 2, 1.2, 1]);
     }
 }
 
@@ -202,6 +237,28 @@ module back() {
 module lower_region() {
     translate([-1, -1, -1]) cube([frame_w + 2, split_y - lap / 2 + 1, 200]);
     translate([-1, split_y - lap / 2 - eps, -1]) cube([frame_w + 2, lap + 2 * eps, 1 + plate_t / 2]);
+}
+
+// ---- panel tray (inside the frame, behind the display panel) ---------------
+// Frame coordinates, but its z runs from the panel side (0) to the back plate (tray_t);
+// printed panel side down.
+
+module panel_tray() {
+    difference() {
+        rbox2d_tray();
+        // pocket for the glass panel, with 0.5 mm for a layer of thin foam
+        translate([panel0.x - 0.3, panel0.y - 0.3, -1]) cube([panel.x + 0.6, panel.y + 0.6, 1 + panel_t + 0.5]);
+        // the flat cable passes through here (same slot as in the back plate)
+        translate([hdr0.x, hdr0.y, -1]) cube([hdr_open.x, hdr_open.y, tray_t + 2]);
+        // weight-saving windows that leave a supporting grid under the panel
+        for (i = [0 : 2], j = [0 : 3])
+            translate([panel0.x + 8 + i * (panel.x - 16) / 3, panel0.y + 14 + j * (panel.y - 28) / 4, panel_t + 1.5])
+                cube([(panel.x - 16) / 3 - 6, (panel.y - 28) / 4 - 6, tray_t]);
+    }
+}
+
+module rbox2d_tray() {
+    linear_extrude(tray_t) rbox2d([m_x + 0.3, m_y + 0.3], [m_x + rabbet_w - 0.3, m_y + rabbet_h - 0.3], 1);
 }
 
 // ---- pod cover (frame coordinates; printed roof-down) ----------------------
@@ -266,10 +323,13 @@ module stand_in_place(angle) {
 if (part == "back") back();
 else if (part == "back_lower") intersection() { back(); lower_region(); }
 else if (part == "back_upper") difference() { back(); lower_region(); }
+else if (part == "panel_tray") panel_tray();
 else if (part == "pod_cover") translate([0, 0, top_z]) mirror([0, 0, 1]) pod_cover();
 else if (part == "stand") translate([0, 0, hinge_r]) stand();
 else {
     color("#ece8e1") back();
     color("#dcd6cc") pod_cover();
     color("#c9c1b3") stand_in_place(stand_open);
+    // the tray sits in the frame's recess, under the plate
+    color("#b9b2a5") translate([0, 0, -tray_t]) panel_tray();
 }
