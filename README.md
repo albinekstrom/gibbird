@@ -22,6 +22,10 @@ file, so you can make a list for anywhere else (see [Other locations](#other-loc
 
 ## Step-by-step
 
+**Placement:** [docs/INSTALLATION.md](docs/INSTALLATION.md) describes where the frame,
+camera, feeder and cables go (office window + balcony), plus the weatherproof camera
+housing (`hardware/camera_housing.scad`).
+
 1. **Buy the parts** (list below). Also get a feeder or perch about 0.5–1.5 m from
    where the camera will sit. The classifier needs the bird to fill a good part of
    the picture. A bird flying past at 5 m will not be identified.
