@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camera Calibration</title>
+<style>
+  :root { --bg: #111; --panel: #1c1c1c; --fg: #eee; --muted: #9a9a9a; --accent: #f5d90a; --zone: #3ddc84; --err: #ff6b6b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--fg); font: 15px/1.45 system-ui, sans-serif; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 { margin: 0 0 4px; font-size: 22px; }
+  h2 { font-size: 16px; margin: 20px 0 8px; }
+  ol { color: var(--muted); padding-left: 20px; margin: 8px 0 12px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  button { background: var(--panel); color: var(--fg); border: 1px solid #333; border-radius: 6px; padding: 8px 12px; font: inherit; cursor: pointer; }
+  button.on { background: var(--accent); color: #000; border-color: var(--accent); }
+  button.primary { border-color: var(--accent); }
+  canvas { width: 100%; display: block; border-radius: 6px; cursor: crosshair; background: #000; }
+  #status { min-height: 1.4em; }
+  table { border-collapse: collapse; }
+  td, th { padding: 4px 8px 4px 0; text-align: left; }
+  input { width: 90px; background: var(--panel); color: var(--fg); border: 1px solid #333; border-radius: 4px; padding: 4px 6px; font: inherit; }
+  .muted { color: var(--muted); }
+  a { color: var(--accent); }
+</style>
+<div class="wrap">
+  <h1>Camera calibration</h1>
+  <p class="muted"><a href="/">← Birds</a></p>
+  <ol>
+    <li><b>Reference points:</b> pick one flat surface where birds land (e.g. the face of the railing,
+      or the floor). Click 4 or more spots on it that you can measure, then type each spot's position in cm
+      (e.g. railing's left end = 0,0; right end = 300,0; with Y going up or across). 5+ points give an error estimate.</li>
+    <li><b>Zones:</b> click <i>Draw zone</i>, click around the area where birds should be detected, then <i>Finish zone</i>.</li>
+    <li><b>Save.</b> The white grid shows 50 cm squares on your surface. If it doesn't line up, fix the points.</li>
+  </ol>
+  <div class="bar">
+    <button id="mPts">Reference points</button>
+    <button id="mZone">Draw zone</button>
+    <button id="finish">Finish zone</button>
+    <button id="undo">Undo</button>
+    <button id="clearZ">Clear zones</button>
+    <button id="refresh">New snapshot</button>
+    <button id="save" class="primary">Save</button>
+  </div>
+  <canvas id="c" width="1600" height="900"></canvas>
+  <p id="status" class="muted"></p>
+  <h2>Reference points (cm on the surface)</h2>
+  <table id="pts"><thead><tr><th>#</th><th>X</th><th>Y</th><th></th></tr></thead><tbody></tbody></table>
+  <h2>Bird size</h2>
+  <p>Ignore moving things smaller than <input id="minS" type="number" step="1"> cm or larger than
+    <input id="maxS" type="number" step="1"> cm (only once calibrated).</p>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const c = $('c'), ctx = c.getContext('2d'), img = new Image();
+let st = { image_points: [], world_points: [], zones_image: [], grid: [] };
+let mode = 'pts', cur = [], zonesDirty = false, haveImage = false;
+
+async function load() {
+  const r = await fetch('api/calibration');
+  st = await r.json();
+  $('minS').value = st.min_size_cm;
+  $('maxS').value = st.max_size_cm;
+  table(); info(st); snap();
+}
+
+function snap() {
+  status('Fetching snapshot…');
+  img.onload = () => { c.width = img.naturalWidth; c.height = img.naturalHeight; haveImage = true; draw(); info(st); };
+  img.onerror = () => status('No snapshot — is `gibbird cam` running?', true);
+  img.src = 'snapshot.jpg?t=' + Date.now();
+}
+
+function poly(pts, close) {
+  ctx.beginPath();
+  pts.forEach((p, i) => (i ? ctx.lineTo : ctx.moveTo).call(ctx, p[0] * c.width, p[1] * c.height));
+  if (close) ctx.closePath();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, c.width, c.height);
+  if (haveImage) ctx.drawImage(img, 0, 0);
+  const s = Math.max(1.5, c.width / 700);
+  ctx.lineWidth = s;
+  ctx.strokeStyle = 'rgba(255,255,255,.55)';
+  for (const l of st.grid || []) { poly(l, false); ctx.stroke(); }
+  ctx.strokeStyle = '#3ddc84'; ctx.fillStyle = 'rgba(61,220,132,.22)';
+  for (const z of st.zones_image) { poly(z, true); ctx.fill(); ctx.stroke(); }
+  if (cur.length) { ctx.strokeStyle = '#f5d90a'; poly(cur, false); ctx.stroke(); }
+  st.image_points.forEach((p, i) => {
+    const x = p[0] * c.width, y = p[1] * c.height;
+    ctx.fillStyle = '#f5d90a'; ctx.beginPath(); ctx.arc(x, y, 7 * s, 0, 7); ctx.fill();
+    ctx.fillStyle = '#000'; ctx.font = `bold ${9 * s}px system-ui`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(i + 1, x, y);
+  });
+}
+
+c.addEventListener('click', e => {
+  const r = c.getBoundingClientRect();
+  const p = [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
+  if (mode === 'pts') { st.image_points.push(p); st.world_points.push([0, 0]); table(); }
+  else cur.push(p);
+  draw();
+});
+
+function table() {
+  const tb = $('pts').tBodies[0];
+  tb.innerHTML = '';
+  st.world_points.forEach((w, i) => {
+    const tr = tb.insertRow();
+    tr.innerHTML = `<td>${i + 1}</td><td><input type="number" step="any"></td><td><input type="number" step="any"></td><td><button>✕</button></td>`;
+    const [a, b] = tr.querySelectorAll('input');
+    a.value = w[0]; b.value = w[1];
+    a.oninput = () => { w[0] = +a.value; };
+    b.oninput = () => { w[1] = +b.value; };
+    tr.querySelector('button').onclick = () => {
+      st.image_points.splice(i, 1); st.world_points.splice(i, 1); table(); draw();
+    };
+  });
+}
+
+function setMode(m) {
+  mode = m;
+  $('mPts').classList.toggle('on', m === 'pts');
+  $('mZone').classList.toggle('on', m === 'zone');
+}
+$('mPts').onclick = () => setMode('pts');
+$('mZone').onclick = () => setMode('zone');
+$('finish').onclick = () => {
+  if (cur.length >= 3) { st.zones_image.push(cur); zonesDirty = true; }
+  cur = []; draw();
+};
+$('undo').onclick = () => {
+  if (mode === 'zone' && cur.length) cur.pop();
+  else if (mode === 'pts' && st.image_points.length) { st.image_points.pop(); st.world_points.pop(); table(); }
+  draw();
+};
+$('clearZ').onclick = () => { st.zones_image = []; cur = []; zonesDirty = true; draw(); };
+$('refresh').onclick = snap;
+$('save').onclick = async () => {
+  const body = {
+    image_points: st.image_points, world_points: st.world_points,
+    min_size_cm: +$('minS').value, max_size_cm: +$('maxS').value,
+    zones_image: zonesDirty ? st.zones_image : null,
+  };
+  const r = await fetch('api/calibration', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+  const d = await r.json();
+  if (!r.ok) { status(d.error || 'Save failed', true); return; }
+  st = d; zonesDirty = false; table(); draw(); info(d, 'Saved. ');
+};
+
+function info(d, prefix = '') {
+  const parts = [d.calibrated ? `Calibrated (${d.image_points.length} points)` : `Not calibrated (${d.image_points.length}/4 points)`];
+  if (d.error_cm != null) parts.push(`fit error ${d.error_cm.toFixed(1)} cm`);
+  if (d.zone_areas_m2 && d.zone_areas_m2.length) parts.push('zones ' + d.zone_areas_m2.map(a => a.toFixed(2) + ' m²').join(', '));
+  else parts.push(d.zones_image.length ? `${d.zones_image.length} zone(s)` : 'no zones: whole picture is watched');
+  status(prefix + parts.join(' · '));
+}
+
+function status(t, err) { $('status').textContent = t; $('status').style.color = err ? 'var(--err)' : ''; }
+
+setMode('pts');
+load();
+</script>
+</html>

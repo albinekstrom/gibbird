@@ -32,6 +32,8 @@ class CamConfig:
     motion_max_area: float = 0.5
     crop_scale: float = 1.6
     data_dir: str = "data"
+    # Detection zones + real-world calibration, edited at http://<pi>:8080/calibrate
+    calibration: str = "data/calibration.json"
     http_host: str = "0.0.0.0"
     http_port: int = 8080
 

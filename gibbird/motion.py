@@ -26,8 +26,11 @@ class MotionDetector:
         self._bg: np.ndarray | None = None
         self._seen = 0
 
-    def update(self, gray: np.ndarray) -> list[Box]:
-        """Feed one grayscale frame; return moving regions, largest first."""
+    def update(self, gray: np.ndarray, mask: np.ndarray | None = None) -> list[Box]:
+        """Feed one grayscale frame; return moving regions, largest first.
+
+        `mask` (uint8, same size, 255 = watch) limits detection to the detection zones.
+        """
         g = cv2.GaussianBlur(gray, (5, 5), 0).astype(np.float32)
         if self._bg is None or self._bg.shape != g.shape:
             self._bg, self._seen = g, 1
@@ -38,8 +41,11 @@ class MotionDetector:
         if self._seen <= self.warmup_frames:
             return []
 
-        mask = cv2.dilate((diff > self.threshold).astype(np.uint8) * 255, None, iterations=2)
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        moving = (diff > self.threshold).astype(np.uint8) * 255
+        if mask is not None:
+            moving = cv2.bitwise_and(moving, mask)
+        moving = cv2.dilate(moving, None, iterations=2)
+        contours, _ = cv2.findContours(moving, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         h, w = gray.shape[:2]
         boxes = []
         for c in contours:

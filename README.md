@@ -43,7 +43,8 @@ file, so you can make a list for anywhere else (see [Other locations](#other-loc
    the balcony door seal and into the hood.
 7. **Install the software** ([Software](#software)). Use `gibbird classify` on a few
    photos and check the web page at `http://birdframe.local:8080`.
-8. **Tune** `min_score`, the camera angle and the feeder position in the first week.
+8. **Calibrate** at `http://birdframe.local:8080/calibrate` ([below](#zones-and-calibration)).
+9. **Tune** `min_score`, the camera angle and the feeder position in the first week.
 
 ## Shopping list
 
@@ -148,6 +149,8 @@ gibbird/           Python package
   watcher.py       motion → classify → confirm over several frames → visits
   store.py         SQLite visit log
   server.py        HTTP API + a simple phone page
+  calibration.py   detection zones, image → real-world (cm) homography, size filter
+  web/             calibration page
   render.py        e-ink poster (1200×1600) + language strings
   frame_app.py     polling, change detection, quiet hours
   data/regions/    species lists (gothenburg.csv)
@@ -162,6 +165,28 @@ species only counts when it wins 2 of 4 checks in a row, and it must be on the r
 list. This stops the model from reporting, say, an American goldfinch in Gothenburg.
 Sightings less than 2 minutes apart count as one visit. The most confident photo of
 each visit is kept.
+
+### Zones and calibration
+
+Open `http://birdframe.local:8080/calibrate` while `gibbird cam` is running. It shows
+a live snapshot.
+
+- **Zones.** Outline where birds should be detected: railing, feeder, flower box.
+  Motion outside the zones is ignored, so trees, the street and neighbours don't
+  trigger anything.
+- **Reference points.** Choose one flat surface where birds land, for example the
+  face of the railing. Click 4 or more spots on it that you've measured with a tape,
+  and type their positions in cm. From these the Pi works out how the picture maps to
+  real centimetres. A white 50 cm grid is then drawn over the snapshot so you can
+  check the fit. With 5 or more points it also shows a fit error.
+- **What calibration gives you.** Zones are stored in centimetres. If the camera gets
+  bumped, redo only the reference points and the zones stay where they were in the
+  real world. Moving things outside the bird size range (default 6–80 cm) are ignored,
+  such as a cat, a person or a flapping towel. Sizes are measured on the reference
+  surface, so things far in front of or behind it are measured less accurately.
+
+Everything is saved to `data/calibration.json` and applied immediately, without a
+restart. The page has no login, so only use it on your home network.
 
 The frame redraws only when the set of species or visit counts changes. It waits at
 least 15 minutes between refreshes and stays dark 23:00–07:00. A full Spectra

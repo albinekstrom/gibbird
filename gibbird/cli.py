@@ -16,6 +16,7 @@ log = logging.getLogger("gibbird")
 
 
 def cmd_cam(cfg: config_mod.Config, args) -> None:
+    from .calibration import Calibration
     from .camera import open_source
     from .classifier import TFLiteClassifier
     from .server import make_server, serve_in_background
@@ -30,11 +31,18 @@ def cmd_cam(cfg: config_mod.Config, args) -> None:
     store = Store(data_dir / "visits.db")
     photos = data_dir / "photos"
 
-    server = make_server(store, region, photos, c.http_host, c.http_port)
+    cal_path = cfg.path(c.calibration)
+    calibration = Calibration.load(cal_path)
+    log.info(
+        "calibration: %s, %d zone(s)",
+        f"{len(calibration.image_points)} reference points" if calibration.calibrated else "none",
+        len(calibration.zones),
+    )
+    watcher = BirdWatcher(c, TFLiteClassifier(cfg.path(c.model), labels), region, store, photos, calibration)
+
+    server = make_server(store, region, photos, c.http_host, c.http_port, watcher, cal_path)
     serve_in_background(server)
     log.info("API on http://%s:%d  (region: %s, %d species)", c.http_host, c.http_port, c.region, len(set(region.values())))
-
-    watcher = BirdWatcher(c, TFLiteClassifier(cfg.path(c.model), labels), region, store, photos)
     for frame in open_source(c):
         watcher.process(frame)
 

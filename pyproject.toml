@@ -23,7 +23,7 @@ gibbird = "gibbird.cli:main"
 include = ["gibbird*"]
 
 [tool.setuptools.package-data]
-gibbird = ["data/regions/*.csv"]
+gibbird = ["data/regions/*.csv", "web/*.html"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
