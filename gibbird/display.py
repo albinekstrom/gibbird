@@ -1,7 +1,8 @@
-"""Output targets for the poster: the Inky panel, or a PNG file for previews."""
+"""Output targets for the poster: an e-ink panel (Pimoroni Inky or Waveshare), or a PNG."""
 
 from __future__ import annotations
 
+import importlib
 import logging
 from pathlib import Path
 from typing import Protocol
@@ -39,6 +40,37 @@ class InkyDisplay:
             self._inky.set_image(img)
         log.info("refreshing e-ink panel (takes ~30 s)")
         self._inky.show()
+
+
+class WaveshareDisplay:
+    """Waveshare e-Paper HATs, through Waveshare's own driver (bundled in gibbird/vendor)."""
+
+    def __init__(self, model: str = "epd7in3e", rotation: int = 90):
+        driver = importlib.import_module(f"gibbird.vendor.waveshare_epd.{model}")
+        self._epd = driver.EPD()
+        w, h = self._epd.width, self._epd.height
+        self.poster_size = (min(w, h), max(w, h))  # we always draw in portrait
+        self.rotation = rotation
+
+    def show(self, img: Image.Image) -> None:
+        w, h = self._epd.width, self._epd.height
+        if (img.width > img.height) != (w > h):
+            img = img.rotate(self.rotation, expand=True)
+        if img.size != (w, h):
+            img = img.resize((w, h), Image.LANCZOS)
+        log.info("refreshing e-ink panel (takes ~30 s)")
+        self._epd.init()
+        self._epd.display(self._epd.getbuffer(img))
+        self._epd.sleep()  # power the panel down between refreshes, as Waveshare recommends
+
+
+def make_display(kind: str, rotation: int = 90, saturation: float = 0.6) -> Display:
+    """`kind` is "inky" or "waveshare:<driver>", e.g. "waveshare:epd7in3e"."""
+    if kind == "inky":
+        return InkyDisplay(rotation, saturation)
+    if kind.startswith("waveshare:"):
+        return WaveshareDisplay(kind.split(":", 1)[1], rotation)
+    raise ValueError(f"unknown display {kind!r}: use 'inky' or 'waveshare:<driver>'")
 
 
 class PreviewDisplay:

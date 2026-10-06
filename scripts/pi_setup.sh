@@ -8,16 +8,28 @@ REBOOT=0
 
 echo "→ system packages"
 apt-get update -q
-apt-get install -y -q python3-venv python3-pip python3-opencv python3-picamera2 fonts-dejavu-core
+apt-get install -y -q python3-venv python3-pip python3-opencv python3-picamera2 fonts-dejavu-core \
+  python3-gpiozero python3-lgpio python3-spidev
 
-echo "→ enabling SPI + I2C for the Inky display"
+# Which display? (config.toml [frame] display = "inky" | "waveshare:...")
+DISPLAY_KIND=$(python3 -c 'import sys, tomllib; print(tomllib.load(open(sys.argv[1], "rb")).get("frame", {}).get("display", "inky"))' \
+  "$APP/config.toml" 2>/dev/null || echo inky)
+echo "→ enabling SPI + I2C for the display ($DISPLAY_KIND)"
 raspi-config nonint do_spi 0
 raspi-config nonint do_i2c 0
 CFG=/boot/firmware/config.txt
-# The 13.3" Inky drives both SPI chip-selects itself (see Pimoroni's inky README).
-if ! grep -q '^dtoverlay=spi0-0cs' "$CFG"; then
-  printf '\n[all]\ndtoverlay=spi0-0cs\n' >> "$CFG"
-  REBOOT=1
+if [ "$DISPLAY_KIND" = inky ]; then
+  # Pimoroni's Spectra Inkys drive the SPI chip-select themselves (see their inky README).
+  if ! grep -q '^dtoverlay=spi0-0cs' "$CFG"; then
+    printf '\n[all]\ndtoverlay=spi0-0cs\n' >> "$CFG"
+    REBOOT=1
+  fi
+else
+  # Waveshare uses the normal hardware chip-select, which spi0-0cs would switch off.
+  if grep -q '^dtoverlay=spi0-0cs' "$CFG"; then
+    sed -i '/^dtoverlay=spi0-0cs/d' "$CFG"
+    REBOOT=1
+  fi
 fi
 
 echo "→ Python environment"

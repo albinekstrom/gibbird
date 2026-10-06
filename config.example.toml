@@ -4,7 +4,7 @@
 # One Raspberry Pi (4 or 5) behind the frame runs both `gibbird cam` and `gibbird frame`.
 
 [cam]
-# Wide-angle 4K USB camera on a 5 m USB 2.0 cable (see README). Wide view = small
+# IMX678 8MP 123° USB camera (4K MJPEG) on a 2–3 m USB 2.0 cable. Wide view = small
 # birds, so use the full resolution for crops and let tiny moving regions through.
 source = "opencv:0"
 main_size = [3840, 2160]
@@ -23,6 +23,7 @@ visit_gap_s = 120             # same species again within 2 min = same visit
 http_port = 8080
 
 [frame]
+display = "waveshare:epd7in3e"   # Waveshare 7.3" e-Paper HAT (E); "inky" for Pimoroni Inky
 server = "http://localhost:8080"   # same Pi; the phone page is http://birdframe.local:8080
 subtitle = "Balkongens gäster"   # "Balcony Visitors"
 title = "Sedda idag"             # "Seen Today"

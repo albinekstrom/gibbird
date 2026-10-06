@@ -52,60 +52,48 @@ housing (`hardware/camera_housing.scad`).
 
 ## Shopping list
 
-Prices are approximate (October 2026). Check Swedish shops first, e.g.
-Electrokit, Kjell & Company or Webhallen. Pimoroni and The Pi Hut ship to Sweden.
+This is the current build: a Pi 4 behind a Waveshare 7.3" e-ink panel, and an IMX678
+USB camera outside the office window. Prices are from amazon.se, October 2026.
 
-**Frame + Pi (bedroom)**
+**Already owned:** Raspberry Pi 4 Model B with its fan and heatsinks, the official Pi 4
+USB-C power supply, a microSD 32 GB High Endurance card, and a picture frame. The 3D
+model still has to be sized for that frame.
 
-| Part | Notes | ≈ Price |
-|---|---|---|
-| Pimoroni Inky Impression 7.3" (2025 ed., Spectra 6) | 800×480, 6 colours, board 174.2×123.2 mm, image area 160×96 mm. The 13.3" (1600×1200, A4) also works with the same code | £66–80 |
-| ~~Raspberry Pi~~ | **Already owned: Pi 4 Model B.** It runs the camera, classifier and display. A Pi 5 also fits the same hood | – |
-| 40-pin GPIO ribbon extension cable, **female → male**, 10–20 cm | Joins the Pi to the display header. Match pin 1 to pin 1 | 60 kr |
-| 4× M2.5×6 screws | Pi onto the printed bosses | 20 kr |
-| Official Pi 4 USB-C power supply (5.1 V 3 A) | Use a mains extension cord to reach the socket, not a long USB-C cable | 100 kr |
-| microSD 32 GB **High Endurance** | It writes continuously | 150 kr |
-| BGA "Galant" A4 frame (22.7×31.4 cm, acrylic) | The 3D model's defaults match it: 8 mm rabbet, 13 mm profile | 150 kr |
-| 6× wood screws 2.5×10 mm countersunk, 4× M3×10 countersunk, 2× M3×16 | Pre-drill 1.5 mm for the wood screws, because the frame's back edge is only ~8 mm wide. M3×10 hold the pod cover, M3×16 are the stand's pivots | 40 kr |
-| 90° USB-C power cable (or angle adapter) | Fits beside the Pi inside the pod | 60 kr |
-| Self-adhesive foam/felt strips, 2–3 mm | Press the display against the glass | 50 kr |
-| Black paper/card mask (optional) | The window is about 201×288 mm, so ~9 mm of the display's printed border shows at one end. A cut mask hides it | – |
-| ~300 g PETG or PLA | | |
-
-**Fan.** The hood has a mount for a 30 mm fan (like the "Pi-Fan" from your Pi 4
-case). It sits over the processor and blows out through a grille in the roof, and air
-comes in through vents in the bottom wall. The display ribbon cable uses the whole
-GPIO header, so power the fan from a spare USB port with a **USB‑A → 2‑pin fan cable**
-(≈30 kr) instead of from GPIO pins 4 and 6.
-
-**Camera (balcony), 3–5 m from the Pi**
-
-The Pi's own flat camera cable can't go that far. A wide-angle USB camera works well:
-USB 2.0 is specified for cables up to 5 m, and the camera gets its power through the
-same cable.
+**Main parts**
 
 | Part | Notes | ≈ Price |
 |---|---|---|
-| Wide-angle **4K (8 MP) USB camera**, UVC with MJPEG, ~100–120° lens | E.g. an ELP or Arducam module with a Sony IMX415 or IMX317 sensor. Autofocus is a bonus but not needed at 1–3 m | 500–900 kr |
-| **USB 2.0 extension cable, 5 m** (flat if it has to pass a door or window seal) | Up to 5 m works without an amplifier. For longer runs, use an **active** USB repeater cable (5–10 m) | 100–200 kr |
-| Right-angle USB-A adapter | So the plug turns sideways inside the hood's top plug space | 30 kr |
+| **Waveshare 7.3" 6‑Color e‑Paper HAT (E)** (E Ink Spectra 6, 800×480) | Comes with the driver board and a 40-pin extension header. The driver board plugs straight onto the Pi, so no ribbon cable is needed | 1 258 kr |
+| **Iyalezirk IMX678 USB camera module, 8 MP, 123°** | USB, 4K MJPEG, 38×38 mm board. Sony Starvis 2 sensor, good in grey winter light. Sold by a third-party seller | 864 kr + 33 kr |
 
-What a 4K wide camera sees of a 12 cm bird: ~190 px at 1 m, ~95 px at 2 m, ~65 px
-at 3 m. The classifier is reliable from about 100 px, so keep the feeder within about
-2 m of the camera.
-
-Other options: **Camera Module 3 Wide** gives a better picture, but it only works on
-a short CSI ribbon (≤ 1 m). You could also put a small Pi Zero 2 W next to the camera
-and send pictures over Wi-Fi, but that means a second computer to look after.
-
-For either option, add:
+**For the frame and the Pi**
 
 | Part | Notes | ≈ Price |
 |---|---|---|
-| IP65 junction box with a clear lid + cable gland + silica gel | Or put the camera indoors behind the balcony door glass. That avoids weather but you get reflections | 150–250 kr |
-| Feeder / perch | This is what brings the birds to the camera | 100–300 kr |
+| 90° USB-C adapter (male → female) | So the power plug fits beside the Pi inside the pod | 50–100 kr |
+| USB-A → 2-pin fan cable, 5 V | Powers the Pi-Fan from a USB port, since the display board takes the GPIO pins | 30–60 kr |
+| Screw kit M2.5 + M3 (stainless) | Pi 4× M2.5×6, pod cover 4× M3×10 countersunk, stand 2× M3×16 | 100–200 kr |
+| 6× wood screws 2.5×10 mm countersunk | Back plate to the frame (pre-drill 1.5 mm) | 30–50 kr |
+| Self-adhesive foam/felt pads, 2–3 mm | Support the thin glass display panel evenly | 50–80 kr |
+| PLA or PETG filament, ~300 g | For the indoor frame back | – |
 
-**Total:** about 2,500–3,000 kr with the 7.3" display and a USB camera, since you already have the Pi.
+**For the camera outside**
+
+| Part | Notes | ≈ Price |
+|---|---|---|
+| USB 2.0 extension, A‑male → A‑female, 2–3 m, **carries data** (flat if it crosses the window seal) | From the camera's cable to the Pi | 80–150 kr |
+| 2× stainless hose clamps (band ≤ 12 mm) | Strap the camera bracket to a railing post without drilling. Choose a size that fits around the post plus the 8 mm base | 40–80 kr |
+| EPDM/rubber tape | Between the bracket and the railing, to grip and protect the paint | 50 kr |
+| PG9 cable gland, IP68 | Seals the cable into the housing | 50–80 kr |
+| Round glass/acrylic disc, 32 mm × 2 mm | The housing's window (the size the housing model works out for this lens) | 30–80 kr |
+| 2 mm silicone O-ring cord or EPDM foam gasket tape | Seals the housing lid | 50–100 kr |
+| Clear outdoor silicone | Glues the window disc in | 60–100 kr |
+| Silica gel sachets | Keep the housing dry; replace each autumn | 40–80 kr |
+| ASA filament (PETG works; never PLA outdoors) | For the camera housing and bracket | 250–350 kr |
+| Feeder for the railing + sunflower seeds | 1.2–1.5 m from the camera. Check your housing association's rules first | 150–350 kr |
+| Optional: conformal coating spray | Extra moisture protection for the camera board | 100 kr |
+
+**Total for what's left to buy:** about **3 000–3 500 kr** including the display and camera.
 
 ## 3D-printed back
 

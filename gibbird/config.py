@@ -40,6 +40,9 @@ class CamConfig:
 
 @dataclass
 class FrameConfig:
+    # "inky" (Pimoroni Inky, auto-detected) or "waveshare:<driver>", e.g. "waveshare:epd7in3e"
+    # for the Waveshare 7.3" e-Paper HAT (E). Re-run `scripts/deploy.sh --setup` after changing.
+    display: str = "inky"
     server: str = "http://localhost:8080"
     subtitle: str = "Balcony Visitors"
     title: str = "Seen Today"

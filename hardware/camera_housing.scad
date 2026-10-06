@@ -1,8 +1,9 @@
-// GibBird — weatherproof housing v2 for a small USB board camera (e.g. a 38 x 38 mm
-// 4K board camera with an M12 lens), plus a tilting bracket.
+// GibBird — weatherproof housing v2 for a small USB board camera (default: the 38 x 38 mm
+// IMX678 8MP 123° USB module), plus a tilting bracket that straps onto a balcony railing post.
 //
 // Use orientation: the camera looks along +Z, +Y is up. A smooth rounded shell with a
-// built-in rain hood over the window; the lid closes the back flush, with a gasket in
+// rain hood over the window, sized from the lens's field of view so it never shows in
+// the picture; the lid closes the back flush, with a gasket in
 // a groove and a PG9 cable gland (big enough to pass a USB-A plug). All screws are
 // inside the shell or under the lid. The board is held by four ribs and pressed into
 // place by pegs on the lid, so it needs no screws.
@@ -13,9 +14,15 @@
 //   lid:     outer face on the bed
 //   bracket: base on the bed
 //
+// Mounting on the balcony railing (no drilling): two stainless hose clamps run through the
+// tunnels in the bracket base and around a railing post; a groove in the back of the base
+// centres it on the post. Put a strip of EPDM/rubber tape between bracket and post. The
+// base also has two countersunk holes for screws or outdoor VHB tape on a flat surface.
+//
 // Hardware: 4x M3 x 12 + washers (lid), 2x M4 x 10 + washers (tilt, self-tapping),
-// PG9 cable gland, 30 mm round x 2 mm glass/acrylic disc + clear silicone,
-// 2 mm silicone O-ring cord (or 2 mm foam gasket tape), a silica gel sachet.
+// 2x stainless hose clamps (band <= 12 mm, size to fit post + base), PG9 cable gland,
+// round glass/acrylic window disc (disc_d x 2 mm) + clear silicone, 2 mm silicone O-ring
+// cord (or 2 mm foam gasket tape), a silica gel sachet.
 
 part = "assembly"; // [assembly, body, lid, bracket]
 
@@ -23,13 +30,15 @@ part = "assembly"; // [assembly, body, lid, bracket]
 board = [38, 38];
 board_t = 1.6;
 lens_len = 22;        // board front face -> front of the lens
+lens_d = 12;          // diameter of the lens's front
+fov_d = 123;          // diagonal field of view (IMX678 module: 123°)
+aspect = [16, 9];
 behind = 18;          // room behind the board for the connector and the gland
 
 /* [Window] */
-disc_d = 30;          // round glass/acrylic window
 disc_t = 2;
-win_d = 26;           // visible opening (keep wider than the lens's view cone)
-hood_len = 24;        // rain/snow hood beyond the window (long: driving rain and snow)
+hood_max = 20;        // rain/snow hood beyond the window; shortened automatically so the
+                      // lens never sees it
 
 /* [Shell] */
 wall = 3.0;           // thick walls keep the camera's own heat in during winter
@@ -54,8 +63,10 @@ pivot_pilot = 3.4;    // M4 self-taps into the pads
 pivot_clear = 4.4;
 arm_t = 5;
 arm_w = 16;
-base = [76, 30, 4];
+base = [76, 40, 8];   // thick enough for the hose-clamp tunnels
 base_screw = 4.5;
+post_w = 40;          // width of the railing post the bracket straps to (MEASURE)
+strap = [13, 2.6];    // hose-clamp band tunnel (width, height)
 
 /* [Hidden] */
 $fn = 64;
@@ -65,6 +76,12 @@ in_h = board.y + 2 * clear;
 W = in_w + 2 * wall;
 H = in_h + 2 * wall;
 standoff = lens_len + 1;                   // lens stops 1 mm behind the window
+// Field of view -> window size and the longest hood that stays out of the picture.
+tan_d = tan(fov_d / 2);
+tan_v = tan_d * aspect.y / norm(aspect);
+win_d = ceil(lens_d + 2 * (front_t + 1) * tan_d + 1);
+disc_d = win_d + 4;
+hood_len = min(hood_max, floor((board.y / 2 + clear - win_d / 2) / tan_v) - 1);
 D_in = standoff + board_t + behind;
 D = D_in + front_t;
 board_z = D_in - standoff - board_t;       // board's back face
@@ -74,7 +91,9 @@ pivot_z = D / 2;
 arm_gap = W + 2 * pivot_boss_t + 1;
 pivot_h = sqrt(pow(H / 2, 2) + pow(D / 2 + hood_len, 2)) + 3;   // room to tilt
 
-echo(str("housing ", W, " x ", H, " x ", D + hood_len, " mm; board back at z = ", board_z));
+echo(str("housing ", W, " x ", H, " x ", D + hood_len, " mm; window ", win_d, " mm, disc ", disc_d,
+         " mm; hood ", hood_len, " mm; board back at z = ", board_z));
+assert(disc_d / 2 < board.x / 2 - 2, "window disc too big to pass the board ribs: use a smaller lens_d/fov");
 
 module rsquare(size, r) { offset(r = r) offset(delta = -r) square(size, center = true); }
 
@@ -89,17 +108,15 @@ module body() {
     difference() {
         union() {
             shell_solid(D);
-            // rain hood: the top and sides of the shell continue past the window,
-            // the sides sloping back towards the bottom
-            translate([0, 0, D - eps]) intersection() {
-                linear_extrude(hood_len) difference() {
-                    rsquare([W, H], radius);
-                    translate([0, -wall]) rsquare([W - 2 * wall, H], radius - wall);
+            // rain/snow hood: the roof continues past the window. Only the roof: with a
+            // wide lens, side cheeks would show in the picture.
+            translate([0, 0, D - eps]) difference() {
+                intersection() {
+                    linear_extrude(hood_len) rsquare([W, H], radius);
+                    translate([-W, H / 2 - wall, 0]) cube([2 * W, wall, hood_len]);
                 }
-                hull() {
-                    translate([-W, -H / 2, 0]) cube([2 * W, H, eps]);
-                    translate([-W, H / 2 - 12, hood_len - eps]) cube([2 * W, 12, eps]);
-                }
+                // drip groove under the front edge, so water falls off instead of creeping back
+                translate([-W, H / 2 - wall - 1, hood_len - 4]) cube([2 * W, 1.6, 1.6]);
             }
             // round pads for the tilt screws
             for (s = [-1, 1])
@@ -162,7 +179,8 @@ module lid() {
 }
 
 module bracket() {
-    // base (screws, or outdoor VHB tape) with two slim tilt arms
+    // base with two slim tilt arms; straps onto a railing post with hose clamps
+    // (or screws / VHB tape on a flat surface)
     difference() {
         union() {
             linear_extrude(base.z) rsquare([base.x, base.y], 6);
@@ -178,7 +196,11 @@ module bracket() {
                 cylinder(d = base_screw, h = base.z + 2);
                 translate([0, 0, base.z - 1]) cylinder(d1 = base_screw, d2 = base_screw + 3, h = 1.5);
             }
+            // tunnels for the hose clamps, running across the base
+            translate([-base.x, s * (base.y / 4) - strap.x / 2, 2]) cube([2 * base.x, strap.x, strap.y]);
         }
+        // groove in the back face that centres the base on the post
+        translate([-post_w / 2 - 0.3, -base.y, -1]) cube([post_w + 0.6, 2 * base.y, 1 + 1.5]);
     }
 }
 

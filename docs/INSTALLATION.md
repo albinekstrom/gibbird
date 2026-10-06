@@ -49,7 +49,14 @@ roughly this view.
 camera, a 12 cm bird is about 190 px across at 1 m and 95 px at 2 m. The classifier
 needs about 100 px to be reliable.
 
-**Mounting** (the base of the tilt bracket):
+**Mounting on the balcony railing (recommended, no drilling):** strap the bracket to a
+railing post with **two stainless hose clamps**. They run through the tunnels in the
+bracket base, and a groove in the back of the base centres it on the post (set
+`post_w` in the model to your post's width). Put a strip of rubber tape underneath so
+it grips and doesn't scratch the paint. Tighten the clamps, set the tilt and pan by
+eye using the live view at `/calibrate`, then tighten the two tilt screws.
+
+**Other mounting options** (the base of the tilt bracket):
 - **Without drilling:** outdoor double-sided tape (3M VHB, outdoor grade). Clean and
   dry the paint first, and apply it above 10 °C so it bonds. Let it set for 24 hours
   before you hang the camera on it. This is reversible, which is good if the
@@ -146,19 +153,10 @@ The camera has to cope with rain most of the year, plus wet snow, frost (often a
 
 ## Parts for this step
 
-| Part | ≈ Price |
-|---|---|
-| Wide-angle 4K USB board camera (38×38 mm board, M12 lens, UVC/MJPEG) | 500–900 kr |
-| Flat USB 2.0 extension, 3 m | 100–150 kr |
-| PG9 cable gland | 20 kr |
-| Round glass/acrylic disc, 30 mm × 2 mm | 30 kr |
-| 2 mm silicone O-ring cord or foam gasket tape | 50 kr |
-| Clear outdoor silicone | 60 kr |
-| 4× M3×12 and 2× M4×10 stainless screws + washers | 30 kr |
-| Outdoor VHB tape (or 2× stainless 4×25 screws) | 80 kr |
-| Outdoor cable clips | 40 kr |
-| Silica gel sachets | 30 kr |
-| Feeder for the railing | 150–300 kr |
+See the "For the camera outside" table in the [README](../README.md#shopping-list).
+In short: the IMX678 USB camera, a 2–3 m USB 2.0 data cable, two stainless hose
+clamps, a PG9 gland, a 32 mm window disc, a gasket, silicone, silica gel and ASA
+filament.
 
 The housing is `hardware/camera_housing.scad`. Measure your camera board (size, lens
 length) when it arrives, then adjust the values at the top of the file and export

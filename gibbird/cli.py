@@ -48,11 +48,11 @@ def cmd_cam(cfg: config_mod.Config, args) -> None:
 
 
 def cmd_frame(cfg: config_mod.Config, args) -> None:
-    from .display import InkyDisplay, PreviewDisplay
+    from .display import PreviewDisplay, make_display
     from .frame_app import FrameApp
 
     f = cfg.frame
-    display = PreviewDisplay(args.preview) if args.preview else InkyDisplay(f.rotation, f.saturation)
+    display = PreviewDisplay(args.preview) if args.preview else make_display(f.display, f.rotation, f.saturation)
     app = FrameApp(f, display)
     if args.once:
         app.tick()

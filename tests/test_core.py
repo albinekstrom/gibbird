@@ -190,3 +190,10 @@ def test_server(tmp_path):
         assert b"Talgoxe" in urlopen(base + "/").read()
     finally:
         srv.shutdown()
+
+
+def test_make_display_rejects_unknown_kind():
+    from gibbird.display import make_display
+
+    with pytest.raises(ValueError, match="unknown display"):
+        make_display("lcd")
